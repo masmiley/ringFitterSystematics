@@ -84,9 +84,9 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
     return (rFitEv->followers_deltat[ifol] <= 20e-6 ||
             rFitEv->followers_deltat[ifol] >= 250e-3 ||
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
-             sqrt(rFitEv->followers_ftkpos_fX[ifol] * rFitEv->followers_ftkpos_fX[ifol]
-             + rFitEv->followers_ftkpos_fY[ifol] * rFitEv->followers_ftkpos_fY[ifol]
-             + rFitEv->followers_ftkpos_fZ[ifol] * rFitEv->followers_ftkpos_fZ[ifol]) > 6000.0 ||
+             sqrt(rFitEv->followers_wpos_fX[ifol] * rFitEv->followers_wpos_fX[ifol]
+             + rFitEv->followers_wpos_fY[ifol] * rFitEv->followers_wpos_fY[ifol]
+             + rFitEv->followers_wpos_fZ[ifol] * rFitEv->followers_wpos_fZ[ifol]) > 6000.0 ||
              rFitEv->followers_energy[ifol][0] <= 4.0 ||
              double(rFitEv->followers_intime[ifol][0])/double(rFitEv->followers_nhit[ifol]) <= 0.5);
 }
@@ -94,9 +94,23 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
 
 /* *********************************** */
 
-void RingFitterEvent::Loop(int USEWATER)
+void RingFitterEvent::Loop(int USEWATER, int dir)
 {
-    TFile* outf = new TFile("MC_CombinedSystematics.root", "recreate");
+    std::string fileName = "MC_CombinedSystematic";
+    std::string dirError = "Incorrect Direction For Loop, must be +1, -1, or 0";
+    switch (dir) {
+        case 0:
+            fileName += "Nominal"; break;
+        case 1:
+            fileName += "Upper"; break;
+        case -1:
+            fileName += "Lower"; break;
+        default:
+            throw new std::invalid_argument(dirError);
+    }
+    fileName += ".root";
+
+    TFile* outf = new TFile(fileName.c_str(), "recreate");
     HistogramMaker* histograms = new HistogramMaker();
 
     if (fChain == 0) return;
@@ -182,7 +196,6 @@ void RingFitterEvent::Loop(int USEWATER)
         histograms->hfitposdiff[1]->Fill(fpos_fY - cpos4_fY);
         histograms->hfitposdiff[2]->Fill(fpos_fZ - cpos4_fZ);
 
-	std::cout << "Histograms Made" << std::endl;
         /* Prompt Cuts */
         if(fit[seed] == false) continue;
         if(double(intime[seed])/double(nhit) <= 0.3) continue;
@@ -206,11 +219,11 @@ void RingFitterEvent::Loop(int USEWATER)
         }
 
         int nfol = 0;
-        double nFolNom = 0;
-        double nFolLow = 0;
-        double nFolUp = 0;
+        double nFolNom;
+        double nFolSystematic = 0;
+
+        double shiftPromptEnergy;
 	
-	std::cout << "At follower loop" << std::endl;
         for (int ifol = 0; ifol < followers_; ifol++) {
 
             // Michel E Cuts
@@ -244,67 +257,128 @@ void RingFitterEvent::Loop(int USEWATER)
             double shiftDownPromptEnergy = HSS->applyEnergyShift(effen_e, -1);
 
             LowScaleSystematics* LSS = new LowScaleSystematics(lowEnergyShift, lowEnergyDelta, sysUpXYZ, sysDownXYZ,
-                                                               sysUpScZ, sysDownScZ, sysUpOffX, sysDownOffX,
-                                                               sysUpOffY, sysDownOffY, sysUpOffZ, sysDownOffZ,
+                                                               sysUpScZ, sysDownScZ, sysUpOffX, sysDownOffX, sysUpOffY,
+                                                               sysDownOffY, sysUpOffZ, sysDownOffZ,
                                                                sysEdepFidVolUp, sysEdepFidVolDown);
 
-            double xPosUp = LSS->applyPositionSystematics(xPos, 1, 1);
-            double xPosDown = LSS->applyPositionSystematics(xPos, -1, 1);
-            double yPosUp = LSS->applyPositionSystematics(yPos, 1, 2);
-            double yPosDown = LSS->applyPositionSystematics(yPos, -1, 2);
-            double zPosUp = LSS->applyPositionSystematics(zPos, 1, 3);
-            double zPosDown = LSS->applyPositionSystematics(zPos, -1, 3);
+            double xSystematic;
+            double ySystematic;
+            double zSystematic;
+
+            TF1* nominalEnergyFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.154)",
+                                             lowEnergyDelta - 10, lowEnergyDelta + 10);
+            TF1* energySmearingFunc;
+
+            switch (dir) {
+                case 0:
+                    xSystematic = xPos;
+                    ySystematic = yPos;
+                    zSystematic = zPos;
+                    shiftPromptEnergy = effen_e;
+                    energySmearingFunc = nominalEnergyFunc;
+                    break;
+                case 1:
+                    xSystematic = LSS->applyPositionSystematics(xPos, 1, 1);
+                    ySystematic = LSS->applyPositionSystematics(yPos, 1, 2);
+                    zSystematic = LSS->applyPositionSystematics(zPos, 1, 3);
+                    shiftPromptEnergy = shiftUpPromptEnergy;
+                    energySmearingFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.172)",
+                                                 lowEnergyDelta - 10, lowEnergyDelta + 10);
+                    break;
+                case -1:
+                    xSystematic = LSS->applyPositionSystematics(xPos, -1, 1);
+                    ySystematic = LSS->applyPositionSystematics(yPos, -1, 2);
+                    zSystematic = LSS->applyPositionSystematics(zPos, -1, 3);
+                    shiftPromptEnergy = shiftDownPromptEnergy;
+                    energySmearingFunc =new TF1("X", "TMath::Gaus(x, 0.0, 0.136)",
+                            lowEnergyDelta - 10, lowEnergyDelta + 10);
+                    break;
+            }
 
             double normalSquareDistance = norm(xPos, yPos, zPos);
-            double upperSquareDistance = norm(xPosUp, yPosUp, zPosUp);
-            double lowerSquareDistance = norm(xPosDown, yPosDown, zPosDown);
+            double systematicDistance = norm(xSystematic, ySystematic, zSystematic);
 
-            TF1* nominal_f = new TF1("X", "TMath::Gaus(x, 0.0, 0.154)", lowEnergyDelta - 10, lowEnergyDelta + 10);
-            TF1* lower_f = new TF1("X", "TMath::Gaus(x, 0.0, 0.136)", lowEnergyDelta - 10, lowEnergyDelta + 10);
-            TF1* upper_f = new TF1("X", "TMath::Gaus(x, 0.0, 0.172)", lowEnergyDelta - 10, lowEnergyDelta + 10);
+            double systematicEnergy = LSS->applySmearing(followerFTK, energySmearingFunc);
+            double nominalEnergy = LSS->applySmearing(followerFTK, nominalEnergyFunc);
 
-            double nominalFTK = LSS->applySmearing(followerFTK, nominal_f);
-            double lowerFTK = LSS->applySmearing(followerFTK, lower_f);
-            double upperFTK = LSS->applySmearing(followerFTK, upper_f);
-
-            double r3Up = (sqrt(upperSquareDistance))/(600 * 10);
-            double r3Low = sqrt((lowerSquareDistance))/(600 * 10);
+            double r3Systematic = sqrt((systematicDistance))/(600 * 10);
             double r3Nom = sqrt((normalSquareDistance))/(600 * 10);
 
-            double cr3Up = 1.01159 - 0.0389943 * r3Up + 0.0250065 * pow(r3Up, 2);
-            double cr3Low = 1.01159 - 0.0389943 * r3Low + 0.0250065 * pow(r3Low, 2);
+            double cr3Systematic = 1.01159 - 0.0389943 * r3Systematic + 0.0250065 * pow(r3Systematic, 2);
             double cr3Nom = 1.01159 - 0.0389943 * r3Nom + 0.0250065 * pow(r3Nom, 2);
 
-            nominalFTK = LSS->correctFollowerEnergy(nominalFTK, cr3Nom);
-            lowerFTK = LSS->correctFollowerEnergy(lowerFTK, cr3Low);
-            upperFTK = LSS->correctFollowerEnergy(upperFTK, cr3Up);
+            systematicEnergy = LSS->correctFollowerEnergy(systematicEnergy, cr3Systematic);
+            nominalEnergy = LSS->correctFollowerEnergy(nominalEnergy, cr3Nom);
 
-            double wPlus = (1. + (sysEdepFidVolUp/100.) * (nominalFTK - 5.05));
-            double wMinus = (1. + (sysEdepFidVolDown/100.) * (nominalFTK - 5.05));
+            double wPlus = (1. + (sysEdepFidVolUp/100.) * (nominalEnergy - 5.05));
+            double wMinus = (1. + (sysEdepFidVolDown/100.) * (nominalEnergy - 5.05));
 
-            if (sqrt(normalSquareDistance) <= 6000.0 && nominalFTK > 4.0) {
-                nFolNom++;
-            }
-
-            if (sqrt(upperSquareDistance) <= 6000.0 && upperFTK > 4.0) {
-                if (edepFidVol) {
-                    nFolUp += wPlus;
-                } else {
-                    nFolUp++;
-                }
-            }
-
-            if (sqrt(lowerSquareDistance) <= 6000.0 && lowerFTK > 4.0) {
-                if (edepFidVol) {
-                    nFolLow += wMinus;
-                } else {
-                    nFolLow++;
-                }
-            }
+           if (sqrt(systematicDistance) <= 6000.0 && systematicEnergy > 4.0) {
+               switch (dir) {
+                   case 0:
+                       nFolSystematic++;
+                       break;
+                   case 1:
+                   {
+                       if (edepFidVol) {
+                           nFolSystematic += wPlus;
+                       } else {
+                           nFolSystematic++;
+                       }
+                       break;
+                   }
+                   case -1:
+                   {
+                       if (edepFidVol) {
+                           nFolSystematic += wMinus;
+                       } else {
+                           nFolSystematic++;
+                       }
+                       break;
+                   }
+               }
+           }
 
             nfol++;
             nfol_tot++;
         }
+
+        histograms->nfollowers_tot->Fill(nfol);
+        histograms->nfollowers_eeffenergy->Fill(shiftPromptEnergy, nfol);
+        histograms->nfollowersmean_eeffenergy->Fill(shiftPromptEnergy, nFolSystematic);
+        histograms->nfollowersmean_eeffenergy_norm->Fill(shiftPromptEnergy);
+
+        if(nrings[seed]==1){
+            histograms->nfollowers_sring->Fill(nfol);
+            histograms->nfollowers_sr_eeffenergy->Fill(shiftPromptEnergy, nfol);
+            histograms->nfollowersmean_sr_eeffenergy->Fill(shiftPromptEnergy, nFolSystematic);
+            histograms->nfollowersmean_sr_eeffenergy_norm->Fill(shiftPromptEnergy);
+        } else if(nrings[seed]==2){
+            histograms->nfollowers_mring->Fill(nfol);
+            histograms->nfollowers_mr_eeffenergy->Fill(shiftPromptEnergy,nfol);
+            histograms->nfollowersmean_mr_eeffenergy->Fill(shiftPromptEnergy,nFolSystematic);
+            histograms->nfollowersmean_mr_eeffenergy_norm->Fill(shiftPromptEnergy);
+        }
+        if(nfol == 0){
+            histograms->nhit_nofollow_tot->Fill(nhit);
+            if(nrings[seed]==1){
+                histograms->nhit_nofollow_sring->Fill(nhit);
+            } else if(nrings[seed]==2){
+                histograms->nhit_nofollow_mring->Fill(nhit);
+            }
+        }
+
+        if (jentry % 100 == 0 && jentry > 0) {
+            std::cout << "Entry " << jentry << " complete" << std::endl;
+        }
     }
+    
+    histograms->nfollowersmean_eeffenergy_norm->Sumw2();
+    histograms->nfollowersmean_eeffenergy->Sumw2();
+    histograms->nfollowersmean_eeffenergy->Divide(histograms->nfollowersmean_eeffenergy_norm);
+    TCanvas* finalPlot = new TCanvas("finalPlot", "Statistical Error and Upper/Lower Error", 1000, 600);
+    finalPlot->SetLogx();
+    histograms->nfollowersmean_eeffenergy->Draw("e1");
+    outf->WriteTObject(histograms->nfollowersmean_eeffenergy);
     std::cout << "dONE" << std::endl;
 }
