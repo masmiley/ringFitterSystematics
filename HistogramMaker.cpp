@@ -70,6 +70,52 @@ HistogramMaker::HistogramMaker() {
     BinLogX(nfollowersmean_mr_eeffenergy_norm,false);
 }
 
+/** Write all the histograms to the ROOT file */
+void HistogramMaker::writeAllToFile(TFile* file)
+{
+    for (int i = 0; i < 3; i++) {
+        file->WriteTObject(hseedpos[i]);
+        file->WriteTObject(hseedposdiff[i]);
+        file->WriteTObject(hfitpos[i]);
+        file->WriteTObject(hfitposdiff[i]);
+    }
+
+    file->WriteTObject(hprompt_nhits);
+    file->WriteTObject(hprompt_nrings);
+    file->WriteTObject(hprompt_pid);
+    file->WriteTObject(hprompt_eeffenergy);
+    file->WriteTObject(hprompt_ueffenergy);
+    file->WriteTObject(hprompt_meffenergy);
+
+    file->WriteTObject(hmichele_nhits);
+    file->WriteTObject(hmichele_deltat);
+    file->WriteTObject(hmichele_energy0);
+    file->WriteTObject(hmichele_energy1);
+    file->WriteTObject(hmichele_energy2);
+
+    file->WriteTObject(hfollowers_nhits);
+    file->WriteTObject(hfollowers_deltat);
+    file->WriteTObject(hfollowers_energy0);
+    file->WriteTObject(hfollowers_energy1);
+    file->WriteTObject(hfollowers_energy2);
+    file->WriteTObject(hfollowers_dist);
+    file->WriteTObject(nfollowers_tot);
+    file->WriteTObject(nfollowers_sring);
+    file->WriteTObject(nfollowers_mring);
+    file->WriteTObject(nhit_nofollow_tot);
+    file->WriteTObject(nhit_nofollow_sring);
+    file->WriteTObject(nhit_nofollow_mring);
+    file->WriteTObject(nfollowers_eeffenergy);
+    file->WriteTObject(nfollowersmean_eeffenergy);
+    file->WriteTObject(nfollowersmean_eeffenergy_norm);
+    file->WriteTObject(nfollowers_sr_eeffenergy);
+    file->WriteTObject(nfollowersmean_sr_eeffenergy);
+    file->WriteTObject(nfollowersmean_sr_eeffenergy_norm);
+    file->WriteTObject(nfollowers_mr_eeffenergy);
+    file->WriteTObject(nfollowersmean_mr_eeffenergy);
+    file->WriteTObject(nfollowersmean_mr_eeffenergy_norm);
+}
+
 /** Set the X Bins to a Logarithmic Scale on the TH1 Histogram h */
 void HistogramMaker::BinLogX(TH1* h, bool loglimits)
 {

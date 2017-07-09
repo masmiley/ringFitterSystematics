@@ -5,7 +5,6 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
-#include <string>
 #include "HistogramMaker.h"
 #include "HighScaleSystematics.h"
 #include "LowScaleSystematics.h"
@@ -43,30 +42,12 @@ const double highEnergyShift = TMath::Abs(37.23 - 38.75)/37.23;
 
 /* ************************************* */
 
-/* Systematic Application Functions */
-
-/** Applies a scaling to given variable var by parameter param */
-double applyScale(double var, double param)
-{
-    return var * (1 + param/100);
-}
-
-/** Smears the value var with the function func */
-double applySmear(double var, TF1* func)
-{
-    return var + func->GetRandom();
-}
+/* Helper Functions */
 
 /** Calculates the norm of the point (x,y,z) */
 double norm(double x, double y, double z)
 {
     return (x * x) + (y * y) + (z * z);
-}
-
-/** Applies the Monte Carlo Energy Correction from the LETA Unidoc */
-Double_t correctMCEnergy(Double_t energy, Double_t cr3)
-{
-    return -0.10872 + 1.0277 * (energy/cr3) - 0.0012247 * pow(energy/cr3, 2);
 }
 
 /** Applies the Michel Electron Cut */
@@ -202,7 +183,8 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
         if(neck != 0) continue;
         if(owl >= 3) continue;
         if(sqrt(spos_fX*spos_fX + spos_fY*spos_fY + spos_fZ*spos_fZ) >= 8500.) continue;
-        if(sqrt(fpos_fX*fpos_fX + fpos_fY*fpos_fY + fpos_fZ*fpos_fZ) <= 0 || sqrt(fpos_fX*fpos_fX + fpos_fY*fpos_fY + fpos_fZ*fpos_fZ) >= 5500) continue;
+        if(sqrt(fpos_fX*fpos_fX + fpos_fY*fpos_fY + fpos_fZ*fpos_fZ) <= 0 ||
+           sqrt(fpos_fX*fpos_fX + fpos_fY*fpos_fY + fpos_fZ*fpos_fZ) >= 5500) continue;
         if((datacleaning & 0xB62CC103000000) != 0) continue;
         if((trigtype & 0x7) == 0x0) continue;
 
@@ -290,8 +272,8 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
                     ySystematic = LSS->applyPositionSystematics(yPos, -1, 2);
                     zSystematic = LSS->applyPositionSystematics(zPos, -1, 3);
                     shiftPromptEnergy = shiftDownPromptEnergy;
-                    energySmearingFunc =new TF1("X", "TMath::Gaus(x, 0.0, 0.136)",
-                            lowEnergyDelta - 10, lowEnergyDelta + 10);
+                    energySmearingFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.136)",
+                                                 lowEnergyDelta - 10, lowEnergyDelta + 10);
                     break;
             }
 
@@ -372,13 +354,6 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
             std::cout << "Entry " << jentry << " complete" << std::endl;
         }
     }
-    
-    histograms->nfollowersmean_eeffenergy_norm->Sumw2();
-    histograms->nfollowersmean_eeffenergy->Sumw2();
-    histograms->nfollowersmean_eeffenergy->Divide(histograms->nfollowersmean_eeffenergy_norm);
-    TCanvas* finalPlot = new TCanvas("finalPlot", "Statistical Error and Upper/Lower Error", 1000, 600);
-    finalPlot->SetLogx();
-    histograms->nfollowersmean_eeffenergy->Draw("e1");
-    outf->WriteTObject(histograms->nfollowersmean_eeffenergy);
-    std::cout << "dONE" << std::endl;
+
+    histograms->writeAllToFile(outf);
 }

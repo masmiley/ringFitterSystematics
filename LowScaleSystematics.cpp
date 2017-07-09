@@ -27,26 +27,45 @@ LowScaleSystematics::LowScaleSystematics(double lowEnergyShift, double lowEnergy
 
 }
 
+/** Application of shift specific to low energy systematics.
+ *  @param var The energy to be shifted.
+ *  @param dir The direction in which the energy is shifted. +1 for up, -1 for down. */
 double LowScaleSystematics::applyEnergyShift(double var, int dir)
 {
     return Systematic::applyEnergyShift(var, _lowEnergyShift/100, dir);
 }
 
+/** Smear var with the function func.
+ *  @param var The variable being smeared.
+ *  @param func The function used for the smearing. */
 double LowScaleSystematics::applySmearing(double var, TF1 *func)
 {
     return Systematic::applySmearing(var, func);
 }
 
+/** The application of the MC Energy Correction for the D2O phase
+ *  (Section 2.4.1 of Unidoc)
+ *  @param energy The MC energy to be corrected.
+ *  @param the C(R^3) parameter as defined in Section 2.4.1. */
 double LowScaleSystematics::correctFollowerEnergy(double energy, double cr3)
 {
     return -0.10872 + 1.0277 * (energy/cr3) - 0.0012247 * pow(energy/cr3, 2);
 }
 
+/** Applies the position systematic scaling.
+ * @param var The variable being scaled
+ * @param param The systematic parameter corresponding to the scaling */
 double LowScaleSystematics::applyPositionScale(double var, double param)
 {
     return var * (1 + param/100);
 }
 
+/** Apply systematics to var.
+ *  @param var The variable to which systematics are applied.
+ *  @param dir The direction of systematics. 1 for upper, -1 for lower.
+ *  @param varFlag The flag indicating which variable var's value corresponds to:
+ *                 x = 1, y = 2, z = 3. Used to determine systematic parameters for
+ *                 systematic application. */
 double LowScaleSystematics::applyPositionSystematics(double var, int dir, int varFlag)
 {
     switch (dir) {
@@ -54,9 +73,15 @@ double LowScaleSystematics::applyPositionSystematics(double var, int dir, int va
             return applyUpSystematics(var, varFlag);
         case -1:
             return applyLowSystematics(var, varFlag);
+        default:
+            throw new std::invalid_argument("Incorrect value for position systematic direction, must be 1 or -1");
     }
 }
 
+/** Apply Upper Systematics to var. Utility function for applyPositionSystematics.
+ *  @param var The variable to which systematics are applied.
+ *  @param varFlag The flag indicating which variable var's value corresponds to. Same
+ *                 use as in applyPositionSystematics. */
 double LowScaleSystematics::applyUpSystematics(double var, int varFlag) {
     double varUp = var;
     varUp = applyPositionScale(varUp, _sysUpXYZ);
@@ -83,6 +108,10 @@ double LowScaleSystematics::applyUpSystematics(double var, int varFlag) {
     return varUp;
 }
 
+/** Apply Lower Systematics to var. Utility function for applyPositionSystematics.
+ *  @param var The variable to which systematics are applied.
+ *  @param varFlag The flag indicating which variable var's value corresponds to. Same
+ *                 use as in applyPositionSystematics. */
 double LowScaleSystematics::applyLowSystematics(double var, int varFlag) {
     double varLow = var;
     varLow = applyPositionScale(varLow, _sysDownXYZ);

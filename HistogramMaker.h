@@ -53,6 +53,7 @@ public:
     TH1F* nfollowersmean_mr_eeffenergy_norm;
 
     HistogramMaker();
+    void writeAllToFile(TFile* file);
 private:
     void BinLogX(TH1* h, bool logLimits);
     void BinLogX(TH2* h, bool logLimits);
