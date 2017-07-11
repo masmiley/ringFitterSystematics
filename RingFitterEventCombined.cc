@@ -5,6 +5,7 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <cmath>
 #include "HistogramMaker.h"
 #include "HighScaleSystematics.h"
 #include "LowScaleSystematics.h"
@@ -14,27 +15,20 @@
 // Low Energy
 const double lowEnergyShift = 0.0041;
 const double lowEnergyDelta = 0.0;
-#define scaleXYZ true;
 const double sysUpXYZ = 0.10;
 const double sysDownXYZ = -0.57;
-#define scaleZ true;
 const double sysUpScZ = 0.40;
 const double sysDownScZ = 0.0;
-#define offsetX true;
 const double sysUpOffX = 1.15 * 10;
 const double sysDownOffX = -0.13 * 10;
-#define offsetY true;
 const double sysUpOffY = 2.87 * 10;
 const double sysDownOffY = -0.17 * 10;
-#define offsetZ true;
 const double sysUpOffZ = 2.58 * 10;
 const double sysDownOffZ = -0.15 * 10;
-#define resolutionX true;
-#define resolutionY true;
-#define resolutionZ true;
-#define edepFidVol true;
 const double sysEdepFidVolUp = 0.85;
 const double sysEdepFidVolDown = -0.49;
+#define edepFidVol true;
+// All other systematic flags defined in LowScaleSystematics.h
 
 // High Energy
 #define highEnergy true;
@@ -177,7 +171,7 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
         histograms->hfitposdiff[1]->Fill(fpos_fY - cpos4_fY);
         histograms->hfitposdiff[2]->Fill(fpos_fZ - cpos4_fZ);
 
-        /* Prompt Cuts */
+        // Prompt Cuts
         if(fit[seed] == false) continue;
         if(double(intime[seed])/double(nhit) <= 0.3) continue;
         if(neck != 0) continue;
@@ -188,23 +182,36 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
         if((datacleaning & 0xB62CC103000000) != 0) continue;
         if((trigtype & 0x7) == 0x0) continue;
 
+        // Applying high scale systematics to effen_e
+        HighScaleSystematics* HSS = new HighScaleSystematics(highEnergyShift);
+        double shiftUpPromptEnergy = HSS->applyEnergyShift(effen_e, 1);
+        double shiftDownPromptEnergy = HSS->applyEnergyShift(effen_e, -1);
+        double shiftPromptEnergy;
+
+        switch (dir) {
+            case 0:
+                shiftPromptEnergy = effen_e; break;
+            case 1:
+                shiftPromptEnergy = shiftUpPromptEnergy; break;
+            case -1:
+                shiftPromptEnergy = shiftDownPromptEnergy; break;
+        }
+
         histograms->hprompt_nhits->Fill(nhit);
         histograms->hprompt_nrings->Fill(nrings[seed]);
         histograms->hprompt_pid->Fill(pid[seed]);
-        if(nrings[seed] == 1){
+        if (nrings[seed] == 1){
             if(pid[seed]==0)
-                histograms->hprompt_eeffenergy->Fill(effen_e);
+                histograms->hprompt_eeffenergy->Fill(shiftPromptEnergy);
             else if(nrings[seed] == 1 && pid[seed]==1)
                 histograms->hprompt_ueffenergy->Fill(effen_m);
         } else if(nrings[seed] == 2){
-            histograms->hprompt_meffenergy->Fill(effen_e);
+            histograms->hprompt_meffenergy->Fill(shiftPromptEnergy);
         }
 
         int nfol = 0;
         double nFolNom;
         double nFolSystematic = 0;
-
-        double shiftPromptEnergy;
 	
         for (int ifol = 0; ifol < followers_; ifol++) {
 
@@ -231,12 +238,8 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
             double xPos = followers_wpos_fX[ifol];
             double yPos = followers_wpos_fY[ifol];
             double zPos = followers_wpos_fZ[ifol];
-
             double followerFTK = followers_energy[ifol][2];
 
-            HighScaleSystematics* HSS = new HighScaleSystematics(highEnergyShift);
-            double shiftUpPromptEnergy = HSS->applyEnergyShift(effen_e, 1);
-            double shiftDownPromptEnergy = HSS->applyEnergyShift(effen_e, -1);
 
             LowScaleSystematics* LSS = new LowScaleSystematics(lowEnergyShift, lowEnergyDelta, sysUpXYZ, sysDownXYZ,
                                                                sysUpScZ, sysDownScZ, sysUpOffX, sysDownOffX, sysUpOffY,
@@ -256,14 +259,12 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
                     xSystematic = xPos;
                     ySystematic = yPos;
                     zSystematic = zPos;
-                    shiftPromptEnergy = effen_e;
                     energySmearingFunc = nominalEnergyFunc;
                     break;
                 case 1:
                     xSystematic = LSS->applyPositionSystematics(xPos, 1, 1);
                     ySystematic = LSS->applyPositionSystematics(yPos, 1, 2);
                     zSystematic = LSS->applyPositionSystematics(zPos, 1, 3);
-                    shiftPromptEnergy = shiftUpPromptEnergy;
                     energySmearingFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.172)",
                                                  lowEnergyDelta - 10, lowEnergyDelta + 10);
                     break;
@@ -271,7 +272,6 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
                     xSystematic = LSS->applyPositionSystematics(xPos, -1, 1);
                     ySystematic = LSS->applyPositionSystematics(yPos, -1, 2);
                     zSystematic = LSS->applyPositionSystematics(zPos, -1, 3);
-                    shiftPromptEnergy = shiftDownPromptEnergy;
                     energySmearingFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.136)",
                                                  lowEnergyDelta - 10, lowEnergyDelta + 10);
                     break;
@@ -292,8 +292,9 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
             systematicEnergy = LSS->correctFollowerEnergy(systematicEnergy, cr3Systematic);
             nominalEnergy = LSS->correctFollowerEnergy(nominalEnergy, cr3Nom);
 
-            double wPlus = (1. + (sysEdepFidVolUp/100.) * (nominalEnergy - 5.05));
-            double wMinus = (1. + (sysEdepFidVolDown/100.) * (nominalEnergy - 5.05));
+            double* weights = LSS->getNewWeights(nominalEnergy);
+            double wPlus = LSS->getwPlus(weights);
+            double wMinus = LSS->getwMinus(weights);
 
            if (sqrt(systematicDistance) <= 6000.0 && systematicEnergy > 4.0) {
                switch (dir) {
@@ -330,18 +331,18 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
         histograms->nfollowersmean_eeffenergy->Fill(shiftPromptEnergy, nFolSystematic);
         histograms->nfollowersmean_eeffenergy_norm->Fill(shiftPromptEnergy);
 
-        if(nrings[seed]==1){
+        if (nrings[seed]==1){
             histograms->nfollowers_sring->Fill(nfol);
             histograms->nfollowers_sr_eeffenergy->Fill(shiftPromptEnergy, nfol);
             histograms->nfollowersmean_sr_eeffenergy->Fill(shiftPromptEnergy, nFolSystematic);
             histograms->nfollowersmean_sr_eeffenergy_norm->Fill(shiftPromptEnergy);
-        } else if(nrings[seed]==2){
+        } else if (nrings[seed]==2){
             histograms->nfollowers_mring->Fill(nfol);
             histograms->nfollowers_mr_eeffenergy->Fill(shiftPromptEnergy,nfol);
             histograms->nfollowersmean_mr_eeffenergy->Fill(shiftPromptEnergy,nFolSystematic);
             histograms->nfollowersmean_mr_eeffenergy_norm->Fill(shiftPromptEnergy);
         }
-        if(nfol == 0){
+        if(nfol == 0) {
             histograms->nhit_nofollow_tot->Fill(nhit);
             if(nrings[seed]==1){
                 histograms->nhit_nofollow_sring->Fill(nhit);

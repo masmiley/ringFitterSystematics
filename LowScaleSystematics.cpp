@@ -52,6 +52,25 @@ double LowScaleSystematics::correctFollowerEnergy(double energy, double cr3)
     return -0.10872 + 1.0277 * (energy/cr3) - 0.0012247 * pow(energy/cr3, 2);
 }
 
+double* LowScaleSystematics::getNewWeights(double energy)
+{
+    double upperWeight =  (1. + (_sysEdepFidVolUp/100.) * (energy - 5.05));
+    double lowerWeight =  (1. + (_sysEdepFidVolDown/100.) * (energy - 5.05));
+    return new double[2] {upperWeight, lowerWeight};
+}
+
+double LowScaleSystematics::getwPlus(double* weights)
+{
+    return weights[0];
+}
+
+double LowScaleSystematics::getwMinus(double* weights)
+{
+    return weights[1];
+}
+
+
+
 /** Applies the position systematic scaling.
  * @param var The variable being scaled
  * @param param The systematic parameter corresponding to the scaling */
@@ -84,26 +103,49 @@ double LowScaleSystematics::applyPositionSystematics(double var, int dir, int va
  *                 use as in applyPositionSystematics. */
 double LowScaleSystematics::applyUpSystematics(double var, int varFlag) {
     double varUp = var;
-    varUp = applyPositionScale(varUp, _sysUpXYZ);
-    varUp = applyPositionScale(varUp, _sysUpScZ);
+    if (_sysUpXYZFlag) {
+        varUp = applyPositionScale(varUp, _sysUpXYZ);
+    }
+
+    if (_sysUpScZFlag) {
+        varUp = applyPositionScale(varUp, _sysUpScZ);
+    }
+
     TF1* resFunc;
+
     switch (varFlag) {
         case 1:
-            varUp = applyPositionShift(varUp, _sysUpOffX, 1);
-            resFunc = new TF1("X", "TMath::Gaus(x, 0, 3.3)", -10, 10);
+            if (_sysUpOffXFlag) {
+                varUp = applyPositionShift(varUp, _sysUpOffX, -1);
+            }
+            if (_sysResXFlag) {
+                resFunc = new TF1("X", "TMath::Gaus(x, 0, 3.3)", -10, 10);
+                varUp = applySmearing(varUp, resFunc);
+            }
             break;
         case 2:
-            varUp = applyPositionShift(varUp, _sysUpOffY, 1);
-            resFunc = new TF1("X", "TMath::Gaus(x, 0, 2.2)", -10, 10);
+            if (_sysUpOffYFlag) {
+                varUp = applyPositionShift(varUp, _sysDownOffY, -1);
+            }
+            if (_sysResYFlag) {
+                resFunc = new TF1("X", "TMath::Gaus(x, 0, 2.2)", -10, 10);
+                varUp = applySmearing(varUp, resFunc);
+            }
             break;
         case 3:
-            varUp = applyPositionShift(varUp, _sysUpOffZ, 1);
-            resFunc = new TF1("X", "TMath::Gaus(x, 0, 1.5)", -10, 10);
+            if (_sysUpOffZFlag) {
+                varUp = applyPositionShift(varUp, _sysDownOffZ, -1);
+            }
+            if (_sysResZFlag) {
+                resFunc = new TF1("X", "TMath::Gaus(x, 0, 1.5)", -10, 10);
+                varUp = applySmearing(varUp, resFunc);
+            }
             break;
         default:
             throw new std::invalid_argument("Incorrect value for varFlag");
 
     }
+
     varUp = applySmearing(varUp, resFunc);
     return varUp;
 }
@@ -114,26 +156,47 @@ double LowScaleSystematics::applyUpSystematics(double var, int varFlag) {
  *                 use as in applyPositionSystematics. */
 double LowScaleSystematics::applyLowSystematics(double var, int varFlag) {
     double varLow = var;
-    varLow = applyPositionScale(varLow, _sysDownXYZ);
-    varLow = applyPositionScale(varLow, _sysDownScZ);
+    if (_sysDownXYZFlag) {
+        varLow = applyPositionScale(varLow, _sysDownXYZ);
+    }
+
+    if (_sysDownScZFlag) {
+        varLow = applyPositionScale(varLow, _sysDownScZ);
+    }
+
     TF1* resFunc;
+
     switch (varFlag) {
         case 1:
-            varLow = applyPositionShift(varLow, _sysDownOffX, -1);
-            resFunc = new TF1("X", "TMath::Gaus(x, 0, 3.3)", -10, 10);
+            if (_sysDownOffXFlag) {
+                varLow = applyPositionShift(varLow, _sysDownOffX, -1);
+            }
+            if (_sysResXFlag) {
+                resFunc = new TF1("X", "TMath::Gaus(x, 0, 3.3)", -10, 10);
+                varLow = applySmearing(varLow, resFunc);
+            }
             break;
         case 2:
-            varLow = applyPositionShift(varLow, _sysDownOffY, -1);
-            resFunc = new TF1("X", "TMath::Gaus(x, 0, 2.2)", -10, 10);
+            if (_sysDownOffYFlag) {
+                varLow = applyPositionShift(varLow, _sysDownOffY, -1);
+            }
+            if (_sysResYFlag) {
+                resFunc = new TF1("X", "TMath::Gaus(x, 0, 2.2)", -10, 10);
+                varLow = applySmearing(varLow, resFunc);
+            }
             break;
         case 3:
-            varLow = applyPositionShift(varLow, _sysDownOffZ, -1);
-            resFunc = new TF1("X", "TMath::Gaus(x, 0, 1.5)", -10, 10);
+            if (_sysDownOffZFlag) {
+                varLow = applyPositionShift(varLow, _sysDownOffZ, -1);
+            }
+            if (_sysResZFlag) {
+                resFunc = new TF1("X", "TMath::Gaus(x, 0, 1.5)", -10, 10);
+                varLow = applySmearing(varLow, resFunc);
+            }
             break;
         default:
             throw new std::invalid_argument("Incorrect value for varFlag");
 
     }
-    varLow = applySmearing(varLow, resFunc);
     return varLow;
 }

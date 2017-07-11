@@ -30,6 +30,9 @@ class LowScaleSystematics : public Systematic {
         double applyPositionSystematics(double var, int dir, int varFlag);
         double correctFollowerEnergy(double energy, double cr3);
         double applySmearing(double var, TF1* func);
+        double* getNewWeights(double energy);
+        double getwPlus(double* weights);
+        double getwMinus(double* weights);
 
     private:
         double applyUpSystematics(double var, int variableFlag);
@@ -48,6 +51,25 @@ class LowScaleSystematics : public Systematic {
         double _sysEdepFidVolDown;
         double _lowEnergyShift;
         double _lowEnergyDelta;
+
+        const bool _sysUpXYZFlag = true;
+        const bool _sysDownXYZFlag = true;
+        const bool _sysUpScZFlag = true;
+        const bool _sysDownScZFlag = true;
+        const bool _sysUpOffXFlag = true;
+        const bool _sysDownOffXFlag = true;
+        const bool _sysUpOffYFlag = true;
+        const bool _sysDownOffYFlag = true;
+        const bool _sysUpOffZFlag = true;
+        const bool _sysDownOffZFlag = true;
+        const bool _sysEdepFidVolUpFlag = true;
+        const bool _sysEdepFidVolDownFlag = true;
+        const bool _lowEnergyShiftFlag = true;
+        const bool _lowEnergyDeltaFlag = true;
+        const bool _sysResXFlag = true;
+        const bool _sysResYFlag = true;
+        const bool _sysResZFlag = true;
+
 };
 
 
