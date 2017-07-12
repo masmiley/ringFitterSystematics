@@ -24,7 +24,8 @@ LowScaleSystematics::LowScaleSystematics(double lowEnergyShift, double lowEnergy
     _sysUpScZ = sysUpScZ;
     _sysEdepFidVolDown = sysEdepFidVolDown;
     _sysEdepFidVolUp = sysEdepFidVolUp;
-
+    _sysUpXYZFlag = true;
+    _sysDownXYZFlag = true;
 }
 
 /** Application of shift specific to low energy systematics.
@@ -146,7 +147,6 @@ double LowScaleSystematics::applyUpSystematics(double var, int varFlag) {
 
     }
 
-    varUp = applySmearing(varUp, resFunc);
     return varUp;
 }
 

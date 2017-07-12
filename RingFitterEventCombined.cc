@@ -357,4 +357,5 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
     }
 
     histograms->writeAllToFile(outf);
+    outf->Close();
 }

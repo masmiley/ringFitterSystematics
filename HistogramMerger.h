@@ -2,19 +2,27 @@
 // Created by Jyotirmai Singh on 7/11/17.
 //
 
-#ifndef HIGHANDLOW_HISTOGRAMMERGER_H
-#define HIGHANDLOW_HISTOGRAMMERGER_H
+#ifndef HISTOGRAMMERGER_H
+#define HISTOGRAMMERGER_H
 
+
+#include <string>
 
 class HistogramMerger {
-    HistogramMerger(TFile* nomFile, TFile* upFile, TFile* lowFile);
-    void mergeHistograms();
+    public:
+        HistogramMerger(TFile* nomFile, TFile* upFile, TFile* lowFile, TFile* outFile);
+        void makeHistograms();
+        TFile* _outFile;
 
     private:
         TFile* _nomFile;
         TFile* _upFile;
         TFile* _lowFile;
         void applyBinErrorCorrection(TH1F* nominal, TH1F* upper, TH1F* lower);
+        void mergeHistograms(TH1F* nominal, TH1F* upper, TH1F* lower, TCanvas* canv);
+        void mergeNormDivisionHistograms(TH1F* nominal, TH1F* upper, TH1F* lower
+                                         TH1F* nominalNorm, TH1F* upperNorm, TH1F* lowerNorm,
+                                         TCanvas* canv);
 };
 
 

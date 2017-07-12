@@ -2,8 +2,8 @@
 // Created by Jyotirmai Singh on 7/7/17.
 //
 
-#ifndef COMBINEDSYSTEMATIC_LOWENERGYSYSTEMATICS_H
-#define COMBINEDSYSTEMATIC_LOWENERGYSYSTEMATICS_H
+#ifndef LOWSCALESYSTEMATICS_H
+#define LOWSCALESYSTEMATICS_H
 
 #include "Systematic.h"
 
@@ -26,7 +26,6 @@ class LowScaleSystematics : public Systematic {
 
         double applyEnergyShift(double var, int dir);
         double applyPositionScale(double var, double param);
-        // VARFLAG IS 1 FOR X 2 FOR Y 3 FOR Z
         double applyPositionSystematics(double var, int dir, int varFlag);
         double correctFollowerEnergy(double energy, double cr3);
         double applySmearing(double var, TF1* func);
@@ -52,8 +51,8 @@ class LowScaleSystematics : public Systematic {
         double _lowEnergyShift;
         double _lowEnergyDelta;
 
-        const bool _sysUpXYZFlag = true;
-        const bool _sysDownXYZFlag = true;
+        bool _sysUpXYZFlag;
+        bool _sysDownXYZFlag;
         const bool _sysUpScZFlag = true;
         const bool _sysDownScZFlag = true;
         const bool _sysUpOffXFlag = true;

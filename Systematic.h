@@ -2,8 +2,8 @@
 // Created by Jyotirmai Singh on 7/7/17.
 //
 
-#ifndef COMBINEDSYSTEMATIC_SYSTEMATIC_H
-#define COMBINEDSYSTEMATIC_SYSTEMATIC_H
+#ifndef SYSTEMATIC_H
+#define SYSTEMATIC_H
 
 
 class Systematic {

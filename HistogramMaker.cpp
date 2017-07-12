@@ -2,7 +2,78 @@
 // Created by Jyotirmai Singh on 7/7/17.
 //
 
+#include <string>
 #include "HistogramMaker.h"
+
+
+TH1F* HistogramMaker::getHisto(std::string name, TFile* file)
+{
+    return (TH1F*) file->Get(name.c_str());
+}
+
+TH2F* HistogramMaker::get2DHisto(std::string name, TFile* file)
+{
+    return (TH2F*) file->Get(name.c_str());
+}
+
+HistogramMaker::HistogramMaker(TFile* file)
+{
+    hseedpos[0] = getHisto("hseedpos_x", file);
+    hseedpos[1] = getHisto("hseedpos_y", file);
+    hseedpos[2] = getHisto("hseedpos_z", file);
+
+    hseedposdiff[0] = getHisto("hseedposdiff_x", file);
+    hseedposdiff[1] = getHisto("hseedposdiff_y", file);
+    hseedposdiff[2] = getHisto("hseedposdiff_z", file);
+
+    hfitpos[0] = getHisto("hfitpos_x", file);
+    hfitpos[1] = getHisto("hfitpos_y", file);
+    hfitpos[2] = getHisto("hfitpos_z", file);
+
+    hfitposdiff[0] = getHisto("hfitposdiff_x", file);
+    hfitposdiff[1] = getHisto("hfitposdiff_y", file);
+    hfitposdiff[2] = getHisto("hfitposdiff_z", file);
+
+    // Prompts
+    hprompt_nhits = getHisto("hprompt_nhits", file);
+    hprompt_nrings = getHisto("hprompt_nrings", file);
+    hprompt_pid = getHisto("hprompt_pid", file);
+    hprompt_eeffenergy = getHisto("hprompt_eeffenergy", file);
+    hprompt_ueffenergy = getHisto("hprompt_ueffenergy", file);
+    hprompt_meffenergy = getHisto("hprompt_meffenergy", file);
+
+    // Michel e
+    hmichele_nhits = getHisto("hmichele_nhits", file);
+    hmichele_deltat = getHisto("hmichele_deltat", file);
+    hmichele_energy0 = getHisto("hmichele_energy0", file);
+    hmichele_energy1 = getHisto("hmichele_energy1", file);
+    hmichele_energy2 = getHisto("hmichele_energy2", file);
+
+    // Neutrons
+    hfollowers_nhits = getHisto("hfollowers_nhits", file);
+    hfollowers_deltat = getHisto("hfollowers_deltat", file);
+    hfollowers_energy0 = getHisto("hfollowers_energy0", file);
+    hfollowers_energy1 = getHisto("hfollowers_energy1", file);
+    hfollowers_energy2 = getHisto("hfollowers_energy2", file);
+    hfollowers_dist = getHisto("hfollowers_dist", file);
+    nfollowers_tot = getHisto("nfollowers_tot", file);
+    nfollowers_sring = getHisto("nfollowers_sring", file);
+    nfollowers_mring = getHisto("nfollowers_mring", file);
+    nhit_nofollow_tot = getHisto("nhit_nofollow_tot", file);
+    nhit_nofollow_sring = getHisto("nhit_nofollow_sring", file);
+    nhit_nofollow_mring = getHisto("nhit_nofollow_mring", file);
+    nfollowers_eeffenergy = get2DHisto("nfollowers_eeffenergy", file);
+    nfollowersmean_eeffenergy = getHisto("nfollowersmean_eeffenergy", file);
+    nfollowersmean_eeffenergy_norm = getHisto("nfollowersmean_eeffenergy_norm", file);
+    nfollowers_sr_eeffenergy = get2DHisto("nfollowers_sr_eeffenergy", file);
+    nfollowersmean_sr_eeffenergy = getHisto("nfollowersmean_sr_eeffenergy", file);
+    nfollowersmean_sr_eeffenergy_norm = getHisto("nfollowersmean_sr_eeffenergy_norm", file);
+    nfollowers_mr_eeffenergy = get2DHisto("nfollowersmean_mr_eeffenergy", file);
+    nfollowersmean_mr_eeffenergy = getHisto("nfollowersmean_mr_eeffenergy", file);
+    nfollowersmean_mr_eeffenergy_norm = getHisto("nfollowersmean_mr_eeffenergy_norm", file);
+
+}
+
 HistogramMaker::HistogramMaker() {
 
     hseedpos[0] = new TH1F("hseedpos_x","Seed Position X",200,-9000,9000);
@@ -21,7 +92,7 @@ HistogramMaker::HistogramMaker() {
     hfitposdiff[1] = new TH1F("hfitposdiff_y","Delta Fit Position Y",200,-5000,5000);
     hfitposdiff[2] = new TH1F("hfitposdiff_z","Delta Fit Position Z",200,-5000,5000);
 
-    // Promts
+    // Prompts
     hprompt_nhits = new TH1F("hprompt_nhits","NHits Prompt",10,200,10000);
     hprompt_nrings = new TH1F("hprompt_nrings","NRings Prompt",3,0,3);
     hprompt_pid = new TH1F("hprompt_pid","PID Prompt",3,0,3);
@@ -37,7 +108,7 @@ HistogramMaker::HistogramMaker() {
     hmichele_energy2 = new TH1F("hmichele_energy2","FTK Energy Michel-e",30,0,100);
 
     // Neutrons
-    hfollowers_nhits = new TH1F("hfollowers_nhit","NHits Neutron Followers",100,0,1000);
+    hfollowers_nhits = new TH1F("hfollowers_nhits","NHits Neutron Followers",100,0,1000);
     hfollowers_deltat = new TH1F("hfollowers_deltat","DeltaT Neutron Followers",30,0,.25);
     hfollowers_energy0 = new TH1F("hfollowers_energy0","WaterFitter Energy Neutron Followers",15,3,10.5);
     hfollowers_energy1 = new TH1F("hfollowers_energy1","Alt. Fitter Corrected Energy Neutron Followers",15,3,10.5);
