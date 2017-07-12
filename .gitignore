@@ -1,0 +1,6 @@
+*.xml
+*.txt
+*.C
+*.iml
+.idea/inspectionProfiles/
+cmake-build-debug/
