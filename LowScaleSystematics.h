@@ -33,8 +33,11 @@ class LowScaleSystematics : public Systematic {
         double getwMinus(double energy);
 
     private:
+        typedef Systematic parent;
         double applyUpSystematics(double var, int variableFlag);
         double applyLowSystematics(double var, int variableFlag);
+
+        /** Systematic Parameters */
         double _sysUpXYZ;
         double _sysDownXYZ;
         double _sysUpScZ;
@@ -50,6 +53,7 @@ class LowScaleSystematics : public Systematic {
         double _lowEnergyShift;
         double _lowEnergyDelta;
 
+        /** Systematic Flags */
         bool _sysUpXYZFlag;
         bool _sysDownXYZFlag;
         const bool _sysUpScZFlag = true;

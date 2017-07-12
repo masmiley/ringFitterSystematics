@@ -1,5 +1,5 @@
 //
-// Created by Jyotirmai Singh on 7/7/17.
+// Created by Jyotirmai Singh of 7/7/17
 //
 
 #ifndef SYSTEMATIC_H

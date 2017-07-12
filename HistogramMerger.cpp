@@ -1,8 +1,9 @@
-//
-// Created by Jyotirmai Singh on 7/11/17.
-//
+/** @class HistogramMerger
+ *  Takes a nominal, lower, and upper file and
+ *  merges the histograms as appropriate, changing errors
+ *  where needed.
+ *  @author Jyotirmai Singh */
 
-#include <iostream>
 #include <cmath>
 #include "HistogramMerger.h"
 #include "HistogramMaker.h"
@@ -14,7 +15,11 @@ HistogramMerger::HistogramMerger(TFile* nomFile, TFile* upFile, TFile* lowFile, 
     _outFile = outFile;
 }
 
-
+/** Applies bin error correction to a nominal histogram, changing its bin errors
+ *  to abs(upperError - lowerError).
+ *  @param nominal The nominal histogram whose errors are changed.
+ *  @param upper The histogram resulting from applying upper systematics.
+ *  @param lower The histogram resulting from applying lower systematics. */
 void HistogramMerger::applyBinErrorCorrection(TH1F* nominal, TH1F* upper, TH1F* lower)
 {
     int nBins = nominal->GetSize();
@@ -29,6 +34,11 @@ void HistogramMerger::applyBinErrorCorrection(TH1F* nominal, TH1F* upper, TH1F* 
     }
 }
 
+/** Overlays nominal with statistical and systematic errors.
+ *  @param nominal The nominal histogram to be overlaid.
+ *  @param upper The histogram resulting from applying upper systematics.
+ *  @param lower The histogram resulting from applying lower systematics.
+ *  @param canv The canvas on which the overlaid nominal plots are drawn. */
 void HistogramMerger::mergeHistograms(TH1F* nominal, TH1F* upper, TH1F* lower,
                                       TCanvas* canv)
 {
@@ -40,6 +50,16 @@ void HistogramMerger::mergeHistograms(TH1F* nominal, TH1F* upper, TH1F* lower,
     nominal->Draw("e2 same");
 }
 
+/** Overlays nominal with statistical and systematic errors. Specialised
+ *  for mean histograms where a division by a norm histogram is required.
+ *  Performs division by norm first and then calls mergeHistograms.
+ *  @param nominal The nominal histogram to be overlaid.
+ *  @param upper The histogram resulting from applying upper systematics.
+ *  @param lower The histogram resulting from applying lower systematics.
+ *  @param nominalNorm What nominal is divided by.
+ *  @param upperNorm What upper is divided by.
+ *  @param lowerNorm What lower is divided by.
+ *  @param canv The canvas on which the overlaid nominal plots are drawn. */
 void HistogramMerger::mergeNormDivisionHistograms(TH1F* nominal, TH1F* upper, TH1F* lower,
                                                   TH1F* nominalNorm, TH1F* upperNorm, TH1F* lowerNorm,
                                                   TCanvas* canv)
@@ -59,6 +79,9 @@ void HistogramMerger::mergeNormDivisionHistograms(TH1F* nominal, TH1F* upper, TH
 }
 
 
+/** Main method, makes all histograms and draws them on
+ *  canvases. Saves canvases to _outFile for later access. Applies
+ *  merging of histograms when necessary. */
 void HistogramMerger::makeHistograms()
 {
     HistogramMaker* histsNominal = new HistogramMaker(_nomFile);

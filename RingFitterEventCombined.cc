@@ -1,3 +1,8 @@
+/** @class RingFitterEventCombined.cc
+ *  Analyses data in ROOT file and produces lower, nominal, or upper
+ *  histograms.
+ *  @authors Jyotrimai Singh, Max Smiley, Javier Caravaca */
+
 #define RingFitterEvent_cxx
 #include "RingFitterEvent.h"
 #include <iostream>
@@ -27,24 +32,34 @@ const double sysUpOffZ = 2.58 * 10;
 const double sysDownOffZ = -0.15 * 10;
 const double sysEdepFidVolUp = 0.85;
 const double sysEdepFidVolDown = -0.49;
-#define edepFidVol true;
-// All other systematic flags defined in LowScaleSystematics.h
 
-// High Energy
+/* Systematic Flags */
+// Edep. Fid. Vol. flag
+#define edepFidVol true;
+// High Energy Flag
 #define highEnergy true;
+// High Energy Shift
 const double highEnergyShift = TMath::Abs(37.23 - 38.75)/37.23;
 
-/* ************************************* */
+// TODO Other systematic flags are in LowScaleSystematics.h/.cpp. These two should go there also.
 
 /* Helper Functions */
 
-/** Calculates the norm of the point (x,y,z) */
+/** Calculates the norm of the point (x,y,z)
+ *  @param x x coordinate.
+ *  @param y y coordinate.
+ *  @param z z coordinate.
+ *  @return x^2 + y^2 + z^2*/
 double norm(double x, double y, double z)
 {
     return (x * x) + (y * y) + (z * z);
 }
 
-/** Applies the Michel Electron Cut */
+/** Applies the Michel Electron Cut.
+ *  @param ifol The follower iteration which is being run.
+ *  @param rFitEv The place to extract all relevant data, just the
+ *                instance of this class running at the moment.
+ *  @return true if the conditions of the Michel E cut are met. */
 bool micheleCut(int ifol, RingFitterEvent* rFitEv)
 {
     return rFitEv->followers_nhit[ifol]>100
@@ -53,7 +68,11 @@ bool micheleCut(int ifol, RingFitterEvent* rFitEv)
            && (rFitEv->followers_datacleaning2[ifol] & 0x100000) == 0x0;
 }
 
-/** Applies the Neutron Cuts */
+/** Applies the Neutron Cuts
+ *  @param ifol The follower iteration which is being run.
+ *  @param rFitEv The place to extract all relevant data, just the
+ *                instance of this class running at the moment.
+ *  @return true if the conditions of the Neutron cut are met.*/
 bool neutronCut(int ifol, RingFitterEvent* rFitEv)
 {
     return (rFitEv->followers_deltat[ifol] <= 20e-6 ||
@@ -67,8 +86,13 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
 }
 
 
-/* *********************************** */
-
+/** Main Function. Loops over all data and populates all histograms
+ *  made in HistogramMaker. Applies low and high scale systematics as
+ *  required by flag settings. Saves plots to MC_CombinedSystematicXXX.root,
+ *  where XXX is either Nominal, Lower, or Upper depending on dir.
+ *  @param USEWATER Whether to use D2O settings.
+ *  @param dir The direction of the systematics applied.
+ *              1 for upper, -1 for lower, 0 for nominal. */
 void RingFitterEvent::Loop(int USEWATER, int dir)
 {
     std::string fileName = "MC_CombinedSystematic";
@@ -354,6 +378,7 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
             }
         }
 
+        // Simple tracker to monitor progress.
         if (jentry % 100 == 0 && jentry > 0) {
             std::cout << "Entry " << jentry << " complete" << std::endl;
         }

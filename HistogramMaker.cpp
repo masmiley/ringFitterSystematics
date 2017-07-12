@@ -1,21 +1,31 @@
-//
-// Created by Jyotirmai Singh on 7/7/17.
-//
+/** @class HistogramMaker
+ *  Manages histogram production, either from a source file
+ *  or by itself.
+ *  @author Jyotirmai Singh */
 
 #include <string>
 #include "HistogramMaker.h"
 
-
+/** Get a TH1F histogram from a file.
+ *  @param name Name of the histogram to be returned.
+ *  @param file Name of file in which to look.
+ *  @return The histogram in file called name. */
 TH1F* HistogramMaker::getHisto(std::string name, TFile* file)
 {
     return (TH1F*) file->Get(name.c_str());
 }
 
+/** Get a TH2F histogram from a file.
+ *  @param name Name of the histogram to be returned.
+ *  @param file Name of file in which to look.
+ *  @return The histogram in file called name. */
 TH2F* HistogramMaker::get2DHisto(std::string name, TFile* file)
 {
     return (TH2F*) file->Get(name.c_str());
 }
 
+/** Constructor for extracting histograms from an input file.
+ *  @param file The file containing the histograms to be built. */
 HistogramMaker::HistogramMaker(TFile* file)
 {
     hseedpos[0] = getHisto("hseedpos_x", file);
@@ -74,6 +84,8 @@ HistogramMaker::HistogramMaker(TFile* file)
 
 }
 
+/** Default constructor. Will make all necessary histograms
+ *  from scratch. */
 HistogramMaker::HistogramMaker() {
 
     hseedpos[0] = new TH1F("hseedpos_x","Seed Position X",200,-9000,9000);
@@ -141,7 +153,9 @@ HistogramMaker::HistogramMaker() {
     BinLogX(nfollowersmean_mr_eeffenergy_norm,false);
 }
 
-/** Write all the histograms to the ROOT file */
+/** Write all the histograms to the ROOT file
+ *  @param file File to which histograms produced by
+ *              this object are written to. */
 void HistogramMaker::writeAllToFile(TFile* file)
 {
     for (int i = 0; i < 3; i++) {
@@ -187,7 +201,9 @@ void HistogramMaker::writeAllToFile(TFile* file)
     file->WriteTObject(nfollowersmean_mr_eeffenergy_norm);
 }
 
-/** Set the X Bins to a Logarithmic Scale on the TH1 Histogram h */
+/** Set the X Bins to a Logarithmic Scale on the TH1 Histogram h.
+ *  @param h The TH1 histogram whose bins are to be changed.
+ *  @param loglimits False if logarithmic scale is to be used. */
 void HistogramMaker::BinLogX(TH1* h, bool loglimits)
 {
 
@@ -216,8 +232,9 @@ void HistogramMaker::BinLogX(TH1* h, bool loglimits)
     delete new_bins;
 }
 
-/** Set the X Bins to a Logarithmic Scale on the TH2 Histogram h */
-// TODO Fix log bin function names so that they are both the same.
+/** Set the X Bins to a Logarithmic Scale on the TH2 Histogram h
+ *  @param h The TH2 histogram whose bins are to be changed.
+ *  @param loglimits False if logarithmic scale is to be used. */
 void HistogramMaker::BinLogX (TH2* h, bool loglimits)
 {
 
