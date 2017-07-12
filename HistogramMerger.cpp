@@ -22,6 +22,9 @@ void HistogramMerger::applyBinErrorCorrection(TH1F* nominal, TH1F* upper, TH1F* 
         double upperErr = upper->GetBinContent(i);
         double lowerErr = lower->GetBinContent(i);
         double error = fabs(upperErr - lowerErr);
+	if (error == 0.0) {
+	    continue;
+	}
         nominal->SetBinError(i, error);
     }
 }
@@ -42,22 +45,15 @@ void HistogramMerger::mergeNormDivisionHistograms(TH1F* nominal, TH1F* upper, TH
                                                   TCanvas* canv)
 {
     nominal->Sumw2();
-    std::cout << "Done nominal sumw2\n";
     nominalNorm->Sumw2();
-    std::cout <<"Done nominal sumw2\n";
     upper->Sumw2();
-    std::cout << "Done upper sumw2\n";
     upperNorm->Sumw2();
-    std::cout << "Done upper sumw2\n";
     lower->Sumw2();
-    std::cout << "Done lower sumw2\n";
     lowerNorm->Sumw2();
-    std::cout << "Done lower sumw2\n";
 
     nominal->Divide(nominalNorm);
     upper->Divide(upperNorm);
     lower->Divide(lowerNorm);
-    std::cout << "Done division\n";
 
     this->mergeHistograms(nominal, upper, lower, canv);
 }
@@ -69,7 +65,6 @@ void HistogramMerger::makeHistograms()
     HistogramMaker* histsUpper = new HistogramMaker(_upFile);
     HistogramMaker* histsLower = new HistogramMaker(_lowFile);
 
-    std::cout << "Got all histograms ########################" << std::endl;
 
     TCanvas* cfitpos = new TCanvas("cfitpos", "Fitted Position for Prompt", 1600, 800);
     cfitpos->Divide(3,2);
@@ -124,7 +119,6 @@ void HistogramMerger::makeHistograms()
                           histsUpper->hprompt_meffenergy,
                           histsLower->hprompt_meffenergy, cprompt);
     cprompt->Update();
-    std::cout << "Made first set of merged histos ###########################" << std::endl;
 
     TCanvas* cmichele = new TCanvas("cmichele","Michel-e Distributions",900,600);
     cmichele->Divide(3,2);
@@ -175,9 +169,6 @@ void HistogramMerger::makeHistograms()
     cnhit_nofollow->cd(3);
     histsNominal->nhit_nofollow_mring->Draw("e1");
 
-
-    std::cout << "Made everything except follower histos ###########################################" << std::endl;
-
     TCanvas* cnfollowmean_eeffenergy = new TCanvas("cnfollowmean_eeffenergy","Number of Followers vs Prompt Energy",700,900);
     gStyle->SetPalette(56);
     cnfollowmean_eeffenergy->Divide(2,3);
@@ -195,9 +186,7 @@ void HistogramMerger::makeHistograms()
     cnfollowmean_eeffenergy->cd(2)->SetLogx();
     histsNominal->nfollowers_eeffenergy->Draw("colz");
     cnfollowmean_eeffenergy->cd(3);
-    std::cout << "Done cd\n";
     cnfollowmean_eeffenergy->cd(3)->SetLogx();
-    std::cout << "Done SetLogx\n";
     this->mergeNormDivisionHistograms(histsNominal->nfollowersmean_sr_eeffenergy,
                                 histsUpper->nfollowersmean_sr_eeffenergy,
                                 histsLower->nfollowersmean_sr_eeffenergy,
@@ -205,7 +194,6 @@ void HistogramMerger::makeHistograms()
                                 histsUpper->nfollowersmean_sr_eeffenergy_norm,
                                 histsLower->nfollowersmean_sr_eeffenergy_norm,
                                 cnfollowmean_eeffenergy);
-    std::cout << "Done MERGE\n";
     cnfollowmean_eeffenergy->cd(4);
     cnfollowmean_eeffenergy->cd(4)->SetLogx();
     histsNominal->nfollowers_sr_eeffenergy->Draw("colz");

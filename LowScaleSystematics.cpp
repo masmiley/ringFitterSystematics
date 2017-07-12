@@ -53,21 +53,14 @@ double LowScaleSystematics::correctFollowerEnergy(double energy, double cr3)
     return -0.10872 + 1.0277 * (energy/cr3) - 0.0012247 * pow(energy/cr3, 2);
 }
 
-double* LowScaleSystematics::getNewWeights(double energy)
+double LowScaleSystematics::getwPlus(double energy)
 {
-    double upperWeight =  (1. + (_sysEdepFidVolUp/100.) * (energy - 5.05));
-    double lowerWeight =  (1. + (_sysEdepFidVolDown/100.) * (energy - 5.05));
-    return new double[2] {upperWeight, lowerWeight};
+    return (1. + (_sysEdepFidVolUp/100.) * (energy - 5.05));
 }
 
-double LowScaleSystematics::getwPlus(double* weights)
+double LowScaleSystematics::getwMinus(double energy)
 {
-    return weights[0];
-}
-
-double LowScaleSystematics::getwMinus(double* weights)
-{
-    return weights[1];
+    return (1. + (_sysEdepFidVolDown/100.) * (energy - 5.05));
 }
 
 
@@ -146,7 +139,6 @@ double LowScaleSystematics::applyUpSystematics(double var, int varFlag) {
             throw new std::invalid_argument("Incorrect value for varFlag");
 
     }
-
     return varUp;
 }
 

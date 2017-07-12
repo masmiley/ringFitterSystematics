@@ -196,6 +196,10 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
             case -1:
                 shiftPromptEnergy = shiftDownPromptEnergy; break;
         }
+	
+	if (!highEnergy) {
+	    shiftPromptEnergy = effen_e;
+	}
 
         histograms->hprompt_nhits->Fill(nhit);
         histograms->hprompt_nrings->Fill(nrings[seed]);
@@ -292,9 +296,8 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
             systematicEnergy = LSS->correctFollowerEnergy(systematicEnergy, cr3Systematic);
             nominalEnergy = LSS->correctFollowerEnergy(nominalEnergy, cr3Nom);
 
-            double* weights = LSS->getNewWeights(nominalEnergy);
-            double wPlus = LSS->getwPlus(weights);
-            double wMinus = LSS->getwMinus(weights);
+            double wPlus = LSS->getwPlus(nominalEnergy);
+            double wMinus = LSS->getwMinus(nominalEnergy);
 
            if (sqrt(systematicDistance) <= 6000.0 && systematicEnergy > 4.0) {
                switch (dir) {

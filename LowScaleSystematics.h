@@ -29,9 +29,8 @@ class LowScaleSystematics : public Systematic {
         double applyPositionSystematics(double var, int dir, int varFlag);
         double correctFollowerEnergy(double energy, double cr3);
         double applySmearing(double var, TF1* func);
-        double* getNewWeights(double energy);
-        double getwPlus(double* weights);
-        double getwMinus(double* weights);
+        double getwPlus(double energy);
+        double getwMinus(double energy);
 
     private:
         double applyUpSystematics(double var, int variableFlag);

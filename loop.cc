@@ -22,6 +22,6 @@ void loop() {
     TFile* outFile = new TFile("Systematics.root", "recreate");
 
     HistogramMerger* merge = new HistogramMerger(nominalFile, upperFile, lowerFile, outFile);
-    merge->makeHistograms();
+    merge->makeHistograms(); 
 
 } 
