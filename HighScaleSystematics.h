@@ -13,7 +13,7 @@ class HighScaleSystematics : public Systematic {
         HighScaleSystematics(double systematicParameter);
         double applyEnergyShift(double var, int dir);
     private:
-        typedef Systematic parent;
+        typedef Systematic super;
         double _systematicParameter;
 };
 

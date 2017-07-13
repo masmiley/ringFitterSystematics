@@ -16,5 +16,5 @@ HighScaleSystematics::HighScaleSystematics(double systematicParameter)
  *  @return The shifted energy. */
 double HighScaleSystematics::applyEnergyShift(double var, int dir)
 {
-    return parent::applyEnergyShift(var, _systematicParameter, dir);
+    return super::applyEnergyShift(var, _systematicParameter, dir);
 }

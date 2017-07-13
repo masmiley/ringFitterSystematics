@@ -33,7 +33,7 @@ class LowScaleSystematics : public Systematic {
         double getwMinus(double energy);
 
     private:
-        typedef Systematic parent;
+        typedef Systematic super;
         double applyUpSystematics(double var, int variableFlag);
         double applyLowSystematics(double var, int variableFlag);
 

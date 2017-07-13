@@ -8,7 +8,8 @@
 #include "HistogramMerger.h"
 #include "HistogramMaker.h"
 
-HistogramMerger::HistogramMerger(TFile* nomFile, TFile* upFile, TFile* lowFile, TFile* outFile) {
+HistogramMerger::HistogramMerger(TFile* nomFile, TFile* upFile, TFile* lowFile, TFile* outFile)
+{
     _nomFile = nomFile;
     _upFile = upFile;
     _lowFile = lowFile;
@@ -16,7 +17,9 @@ HistogramMerger::HistogramMerger(TFile* nomFile, TFile* upFile, TFile* lowFile, 
 }
 
 /** Applies bin error correction to a nominal histogram, changing its bin errors
- *  to abs(upperError - lowerError).
+ *  to abs(upperError - lowerError). If this quantity is 0, we don't change the
+ *  bin error since the SetBinError function behaves strangely when the error is
+ *  0 and the error bars are not drawn properly.
  *  @param nominal The nominal histogram whose errors are changed.
  *  @param upper The histogram resulting from applying upper systematics.
  *  @param lower The histogram resulting from applying lower systematics. */

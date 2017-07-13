@@ -52,7 +52,7 @@ LowScaleSystematics::LowScaleSystematics(double lowEnergyShift, double lowEnergy
  *  @return The shifted energy. */
 double LowScaleSystematics::applyEnergyShift(double var, int dir)
 {
-    return parent::applyEnergyShift(var, _lowEnergyShift/100, dir);
+    return super::applyEnergyShift(var, _lowEnergyShift/100, dir);
 }
 
 /** Smear var with the function func.
@@ -61,7 +61,7 @@ double LowScaleSystematics::applyEnergyShift(double var, int dir)
  *  @return The smeared value of var. */
 double LowScaleSystematics::applySmearing(double var, TF1* func)
 {
-    return parent::applySmearing(var, func);
+    return super::applySmearing(var, func);
 }
 
 /** The application of the MC Energy Correction for the D2O phase
