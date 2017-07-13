@@ -12,7 +12,8 @@
  *  @param param The energy systematic parameter.
  *  @param dir The direction in which the energy is shifted. +1 for up, -1 for down.
  *  @return The shifted energy. */
-double Systematic::applyEnergyShift(double var, double param, int dir) {
+double Systematic::applyEnergyShift(double var, double param, int dir) 
+{
     switch (dir) {
         case 1:
             return var * (1 + param);
@@ -28,7 +29,8 @@ double Systematic::applyEnergyShift(double var, double param, int dir) {
  *  @param param The position systematic parameter.
  *  @param dir The direction in which the energy is shifted. +1 for up, -1 for down.
  *  @return The shifted position. */
-double Systematic::applyPositionShift(double var, double param, int dir) {
+double Systematic::applyPositionShift(double var, double param, int dir) 
+{
     switch (dir) {
         case 1:
             return var + param;
@@ -43,6 +45,7 @@ double Systematic::applyPositionShift(double var, double param, int dir) {
  *  @param var The value to be smeared.
  *  @param func The function to use for smearing.
  *  @return The smeared value. */
-double Systematic::applySmearing(double var, TF1* func) {
+double Systematic::applySmearing(double var, TF1* func) 
+{
     return var + func->GetRandom();
 }
