@@ -9,11 +9,11 @@ void loop() {
     std::cout << "Initiating Loops" << std::endl;
 
     std::cout << "Nominal Loop" << std::endl;
-    events.Loop(1, 0);
+    events.Loop(1, 0, false);
     std::cout << "Upper Loop" << std::endl;
-    events.Loop(1, 1);
+    events.Loop(1, 1, false);
     std::cout << "Lower Loop" << std::endl;
-    events.Loop(1, -1);
+    events.Loop(1, -1, false);
     std::cout << "Looping Done, creating Histograms" << std::endl;
 
     TFile* nominalFile = new TFile("MC_CombinedSystematicNominal.root", "open");
