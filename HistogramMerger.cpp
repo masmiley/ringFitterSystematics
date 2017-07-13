@@ -50,6 +50,7 @@ void HistogramMerger::mergeHistograms(TH1F* nominal, TH1F* upper, TH1F* lower,
     clonedHisto->Draw("e1");
     this->applyBinErrorCorrection(nominal, upper, lower);
     nominal->SetFillColor(kRed);
+    nominal->SetFillStyle(3001);
     nominal->Draw("e2 same");
 }
 
@@ -126,7 +127,6 @@ void HistogramMerger::makeHistograms()
     TCanvas* cprompt = new TCanvas("cprompt","Prompt Distributions", 1600, 800);
     cprompt->Divide(3,2);
     cprompt->cd(1);
-
     histsNominal->hprompt_nhits->Draw("e1");
     cprompt->cd(2);
     histsNominal->hprompt_nrings->Draw("e1");
