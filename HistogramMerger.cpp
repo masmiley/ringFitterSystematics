@@ -52,6 +52,7 @@ void HistogramMerger::mergeHistograms(TH1F* nominal, TH1F* upper, TH1F* lower,
     nominal->SetFillColor(kRed);
     nominal->SetFillStyle(3001);
     nominal->Draw("e2 same");
+    canv->Update();
 }
 
 /** Overlays nominal with statistical and systematic errors. Specialised

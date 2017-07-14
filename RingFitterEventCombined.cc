@@ -227,7 +227,7 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
 
         histograms->hprompt_nhits->Fill(nhit);
         histograms->hprompt_nrings->Fill(nrings[seed]);
-        histograms->hprompt_pid->Fill(pid[seed]);
+        if (nrings[seed] == 1) histograms->hprompt_pid->Fill(pid[seed]);
         if (nrings[seed] == 1){
             if(pid[seed]==0)
                 histograms->hprompt_eeffenergy->Fill(shiftPromptEnergy);
