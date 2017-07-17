@@ -4,3 +4,4 @@
 *.iml
 .idea/inspectionProfiles/
 cmake-build-debug/
+*.root
