@@ -43,7 +43,7 @@ const double highEnergyShift = TMath::Abs(37.23 - 38.75)/37.23;
 
 // TODO Other systematic flags are in LowScaleSystematics.h/.cpp. These two should go there also.
 
-/* Helper Functions */
+	/* Helper Functions */
 
 /** Calculates the norm of the point (x,y,z)
  *  @param x x coordinate.
@@ -78,11 +78,11 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
     return (rFitEv->followers_deltat[ifol] <= 20e-6 ||
             rFitEv->followers_deltat[ifol] >= 250e-3 ||
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
-            sqrt(rFitEv->followers_wpos_fX[ifol] * rFitEv->followers_wpos_fX[ifol]
-             + rFitEv->followers_wpos_fY[ifol] * rFitEv->followers_wpos_fY[ifol]
-             + rFitEv->followers_wpos_fZ[ifol] * rFitEv->followers_wpos_fZ[ifol]) > 6000.0 ||
-             rFitEv->followers_energy[ifol][0] <= 4.0 ||
-             double(rFitEv->followers_intime[ifol][0])/double(rFitEv->followers_nhit[ifol]) <= 0.5);
+            sqrt(rFitEv->followers_ftkpos_fX[ifol] * rFitEv->followers_ftkpos_fX[ifol] +
+                 rFitEv->followers_ftkpos_fY[ifol] * rFitEv->followers_ftkpos_fY[ifol] +
+                 rFitEv->followers_ftkpos_fZ[ifol] * rFitEv->followers_ftkpos_fZ[ifol]) > 6000.0 ||
+            rFitEv->followers_energy[ifol][0] <= 4.0 ||
+            rFitEv->followers_ftkitr[ifol] <= 0.5);
 }
 
 
