@@ -244,7 +244,14 @@ void HistogramMerger::makeHistograms()
     _outFile->WriteTObject(cnfollow);
     _outFile->WriteTObject(cnhit_nofollow);
     _outFile->WriteTObject(cnfollowmean_eeffenergy);
-
+  
+    // Write Histograms for later use
+    _outFile->WriteTObject(histsNominal->nfollowersmean_eeffenergy);
+    _outFile->WriteTObject(histsNominal->nfollowersmean_mr_eeffenergy);
+    _outFile->WriteTObject(histsNominal->nfollowersmean_sr_eeffenergy);
+    _outFile->WriteTObject(histsNominal->hprompt_eeffenergy);
+    _outFile->WriteTObject(histsNominal->hprompt_meffenergy);
+    _outFile->WriteTObject(histsNominal->hprompt_ueffenergy);
     _outFile->Close();
 
 }

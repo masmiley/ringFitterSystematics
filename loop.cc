@@ -16,12 +16,13 @@ void loop(bool USEDATA, std::string fName) {
     std::cout << "Lower Loop" << std::endl;
     events.Loop(1, -1, USEDATA);
     std::cout << "Looping Done, creating Histograms" << std::endl;
-
+    
+    std::string outname = USEDATA ? "SystematicsData.root" : "Systematics.root";
     TFile* nominalFile = new TFile("MC_CombinedSystematicNominal.root", "open");
     TFile* upperFile = new TFile("MC_CombinedSystematicUpper.root", "open");
     TFile* lowerFile = new TFile("MC_CombinedSystematicLower.root", "open");
-    TFile* outFile = new TFile("SystematicsData.root", "recreate");
-
+    TFile* outFile = new TFile(outname.c_str(), "recreate");
+ 
     HistogramMerger* merge = new HistogramMerger(nominalFile, upperFile, lowerFile, outFile);
     merge->makeHistograms(); 
 
