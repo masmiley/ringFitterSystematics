@@ -3,12 +3,11 @@ Atmospheric Systematic Propagation for the SNO experiment. Applies High Low Ener
 
 ## Use
 In a ROOT Session:
-- `.L Systematic.cpp`
-- `.L LowScaleSystematics.cpp`
-- `.L HighScaleSystematics.cpp`
-- `.L HistogramMaker.cpp`
-- `.L HistogramMerger.cpp`
-- `.x loop.cc`
+```c++
+$ .x runAll.cc(USEWATER, filename)
+```
+int USEWATER = 1 or D2O, 0 otherwise. 
+std::string filename = name of file from which events tree is to be read.
 
 ### Systematic Flag Selection
 There is flexibility available in choosing systematics. Most systematic flags are found in `LowScaleSystematics.h`. Due
