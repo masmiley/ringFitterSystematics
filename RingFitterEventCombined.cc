@@ -35,21 +35,21 @@ const double sysEdepFidVolDown = -0.49;
 
 /* Systematic Flags */
 // Edep. Fid. Vol. flag
-#define edepFidVol true;
+const bool edepFidVol = true;
 // High Energy Flag
-#define highEnergy true;
+const bool highEnergy = true;
 // High Energy Shift
 const double highEnergyShift = TMath::Abs(37.23 - 38.75)/37.23;
 
 // TODO Other systematic flags are in LowScaleSystematics.h/.cpp. These two should go there also.
 
-	/* Helper Functions */
+/* Helper Functions */
 
 /** Calculates the norm of the point (x,y,z)
  *  @param x x coordinate.
  *  @param y y coordinate.
  *  @param z z coordinate.
- *  @return x^2 + y^2 + z^2*/
+ *  @return x^2 + y^2 + z^2 */
 double norm(double x, double y, double z)
 {
     return (x * x) + (y * y) + (z * z);
@@ -62,10 +62,10 @@ double norm(double x, double y, double z)
  *  @return true if the conditions of the Michel E cut are met. */
 bool micheleCut(int ifol, RingFitterEvent* rFitEv)
 {
-    return rFitEv->followers_nhit[ifol]>100
-           && rFitEv->followers_deltat[ifol] > 800e-9
-           && rFitEv->followers_deltat[ifol] < 20e-6
-           && (rFitEv->followers_datacleaning2[ifol] & 0x100000) == 0x0;
+    return rFitEv->followers_nhit[ifol]>100 &&
+           rFitEv->followers_deltat[ifol] > 800e-9 &&
+           rFitEv->followers_deltat[ifol] < 20e-6 &&
+           (rFitEv->followers_datacleaning2[ifol] & 0x100000) == 0x0;
 }
 
 /** Applies the Neutron Cuts
@@ -75,12 +75,13 @@ bool micheleCut(int ifol, RingFitterEvent* rFitEv)
  *  @return true if the conditions of the Neutron cut are met.*/
 bool neutronCut(int ifol, RingFitterEvent* rFitEv)
 {
-    return (rFitEv->followers_deltat[ifol] <= 20e-6 ||
+    double ftkDist = sqrt(rFitEv->followers_ftkpos_fX[ifol] * rFitEv->followers_ftkpos_fX[ifol] +
+                          rFitEv->followers_ftkpos_fY[ifol] * rFitEv->followers_ftkpos_fY[ifol] +
+                          rFitEv->followers_ftkpos_fZ[ifol] * rFitEv->followers_ftkpos_fZ[ifol]);
+    return (rFitEv->followers_deltat[ifol] <= 20e-6  ||
             rFitEv->followers_deltat[ifol] >= 250e-3 ||
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
-            sqrt(rFitEv->followers_ftkpos_fX[ifol] * rFitEv->followers_ftkpos_fX[ifol] +
-                 rFitEv->followers_ftkpos_fY[ifol] * rFitEv->followers_ftkpos_fY[ifol] +
-                 rFitEv->followers_ftkpos_fZ[ifol] * rFitEv->followers_ftkpos_fZ[ifol]) > 6000.0 ||
+            ftkDist > 6000.0 ||
             rFitEv->followers_energy[ifol][0] <= 4.0 ||
             rFitEv->followers_ftkitr[ifol] <= 0.5);
 }
