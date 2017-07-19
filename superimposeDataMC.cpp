@@ -28,5 +28,7 @@ void superimposeDataMC(std::string nameMC, std::string nameDATA)
     TCanvas* cprompts = new TCanvas("cprompts","Prompt Distributions", 1600, 800);
     cprompts->Divide(3, 1);
     plot(cprompts, 1, "hprompt_eeffenergy", dataFile, mcFile);
+    plot(cprompts, 2, "hprompt_ueffenergy", dataFile, mcFile);
+    plot(cprompts, 3, "hprompt_meffenergy", dataFile, mcFile);
 
 }
