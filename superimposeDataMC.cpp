@@ -21,8 +21,8 @@ void plot(TCanvas* canv, int num, std::string name, TFile* dataFile, TFile* mcFi
 
 void superimposeDataMC(std::string nameMC, std::string nameDATA)
 {
-    TFile* mcFile = new TFile(nameMC, "open");
-    TFile* dataFile = new TFile(nameDATA, "open");
+    TFile* mcFile = new TFile(nameMC.c_str(), "open");
+    TFile* dataFile = new TFile(nameDATA.c_str(), "open");
     TFile* combinedPlot = new TFile("DataMC", "recreate");
 
     TCanvas* cprompts = new TCanvas("cprompts","Prompt Distributions", 1600, 800);
