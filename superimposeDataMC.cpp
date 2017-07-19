@@ -23,7 +23,7 @@ void superimposeDataMC(std::string nameMC, std::string nameDATA)
 {
     TFile* mcFile = new TFile(nameMC.c_str(), "open");
     TFile* dataFile = new TFile(nameDATA.c_str(), "open");
-    TFile* combinedPlot = new TFile("DataMC", "recreate");
+    TFile* combinedPlot = new TFile("FinalPlots.root", "recreate");
 
     TCanvas* cprompts = new TCanvas("cprompts","Prompt Distributions", 1600, 800);
     cprompts->Divide(3, 1);
@@ -36,4 +36,10 @@ void superimposeDataMC(std::string nameMC, std::string nameDATA)
     plot(cnfollowersmean_eeffenergy, 1, "nfollowersmean_eeffenergy", dataFile, mcFile);
     plot(cnfollowersmean_eeffenergy, 2, "nfollowersmean_sr_eeffenergy", dataFile, mcFile);
     plot(cnfollowersmean_eeffenergy, 3, "nfollowersmean_mr_eeffenergy", dataFile, mcFile);
+    
+    combinedPlot->WriteTObject(cprompts);
+    combinedPlot->WriteTObject(cnfollowersmean_eeffenergy);
+    combinedPlot->Close();
+    dataFile->Close();
+    mcFile->Close();
 }
