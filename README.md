@@ -4,7 +4,7 @@ Atmospheric Systematic Propagation for the SNO experiment. Applies High Low Ener
 ## Use
 In a ROOT Session:
 ```c++
-`.x runAll.cc(USEWATER, filename)
+$ .x runAll.cc(USEWATER, filename)
 ```
 int USEWATER = 1 or D2O, 0 otherwise. 
 std::string filename = name of file from which events tree is to be read.
