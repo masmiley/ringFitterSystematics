@@ -24,6 +24,11 @@ void loop(bool USEDATA, std::string fName) {
     TFile* outFile = new TFile(outname.c_str(), "recreate");
  
     HistogramMerger* merge = new HistogramMerger(nominalFile, upperFile, lowerFile, outFile);
-    merge->makeHistograms(); 
+    merge->makeHistograms();
+
+    nominalFile->Close();
+    upperFile->Close();
+    lowerFile->Close();
+    outFile->Close();
 
 } 
