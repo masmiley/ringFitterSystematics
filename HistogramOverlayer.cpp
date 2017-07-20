@@ -128,7 +128,7 @@ void HistogramOverlayer::makeHistograms()
         c1->Clear();
         c2->Clear();
       }
-      if (i == histsMC->hists.size() - 1) {
+      else if (i == histsMC->hists.size() - 1) {
           c1->Print((pdffilename+string("]")).c_str(), "pdf");
     
       }
