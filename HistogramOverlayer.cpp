@@ -55,6 +55,9 @@ void HistogramOverlayer::makeHistograms()
         TPaveStats *st2; 
         if (hMC->GetMaximum() >= hData->GetMaximum()) {
           c1->cd();
+          if ((string(hData->GetName())).find("nfollowers") == std::string::npos && (string(hData->GetName())).find("eeffenergy") == std::string::npos) {
+            c1->SetLogx();
+          }
           hMC->Draw("hist");
           c1->Modified();
           c1->Update();
@@ -68,6 +71,9 @@ void HistogramOverlayer::makeHistograms()
         }
         else {
           c1->cd();
+          if ((string(hData->GetName())).find("nfollowers") == std::string::npos && (string(hData->GetName())).find("eeffenergy") == std::string::npos) {
+            c1->SetLogx();
+          }
           hData->Draw("e1");
           c1->Modified();
           c1->Update();
@@ -104,6 +110,10 @@ void HistogramOverlayer::makeHistograms()
       else if (histsData->hists.at(i)->IsA() == TH2F::Class() && histsMC->hists.at(i)->IsA() == TH2F::Class()) {
         TH2F* h2Data = (TH2F*) histsData->hists.at(i);
         TH2F* h2MC = (TH2F*) histsMC->hists.at(i);
+        if ((string(hData->GetName())).find("nfollowers") == std::string::npos && (string(hData->GetName())).find("eeffenergy") == std::string::npos) {
+          c1->SetLogx();
+          c2->SetLogx();
+        }
         c1->cd();
         h2Data->Draw();
         c2->cd();
