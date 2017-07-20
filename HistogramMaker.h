@@ -54,14 +54,15 @@ public:
 
     std::vector<TH1*> hists;
 
-    HistogramMaker();
+    HistogramInitializer();
     HistogramMaker(TFile* file);
     void writeAllToFile(TFile* file);
+    void writeAllToFileVec(TFile* file);
 private:
     void BinLogX(TH1* h, bool logLimits);
     void BinLogX(TH2* h, bool logLimits);
-    TH1F* getHisto(std::string name, TFile* file);
-    TH2F* get2DHisto(std::string name, TFile* file);
+    TH1F* getHisto(TH1F* hist, TFile* file);
+    TH2F* get2DHisto(TH2F* hist, TFile* file);
 };
 
 

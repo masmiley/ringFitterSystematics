@@ -7,12 +7,15 @@
 #include "HistogramMaker.h"
 
 /** Get a TH1F histogram from a file.
- *  @param name Name of the histogram to be returned.
+ *  @param hist Histogram to be returned, either altered or the same.
  *  @param file Name of file in which to look.
  *  @return The histogram in file called name. */
-TH1F* HistogramMaker::getHisto(std::string name, TFile* file)
+TH1F* HistogramMaker::getHisto(TH1F* hist, TFile* file)
 {
-    TH1F* hist = (TH1F*) file->Get(name.c_str());
+    std::cout << "Name: " << hist->GetName() << std::endl;
+    TH1F* temphist = (TH1F*) file->Get(hist->GetName());
+    std::cout << hist << ": " << temphist << std::endl;
+    if (temphist != 0) return temphist;
     return hist;
 }
 
@@ -20,81 +23,92 @@ TH1F* HistogramMaker::getHisto(std::string name, TFile* file)
  *  @param name Name of the histogram to be returned.
  *  @param file Name of file in which to look.
  *  @return The histogram in file called name. */
-TH2F* HistogramMaker::get2DHisto(std::string name, TFile* file)
+TH2F* HistogramMaker::get2DHisto(TH2F* hist, TFile* file)
 {
-    return (TH2F*) file->Get(name.c_str());
+    TH2F* temphist = (TH2F*) file->Get(hist->GetName());
+    if (temphist != 0) hist = temphist;
+    return hist;
 }
 
 /** Constructor for extracting histograms from an input file.
  *  @param file The file containing the histograms to be built. */
 HistogramMaker::HistogramMaker(TFile* file)
 {
-    HistogramMaker();
+    std::cout << "Constructing" << std::endl;
+    HistogramInitializer();
+    if (file != 0) {
+      std::cout << "Default constructor done" << std::endl;
+      std::cout << hseedpos[0] << std::endl;
+      hseedpos[0] = getHisto(hseedpos[0], file);
+      std::cout << "Got seedpos0 " << std::endl;
+      hseedpos[1] = getHisto(hseedpos[1], file);
+      hseedpos[2] = getHisto(hseedpos[2], file);
 
-    hseedpos[0] = getHisto("hseedpos_x", file);
-    hseedpos[1] = getHisto("hseedpos_y", file);
-    hseedpos[2] = getHisto("hseedpos_z", file);
+      hseedposdiff[0] = getHisto(hseedposdiff[0], file);
+      hseedposdiff[1] = getHisto(hseedposdiff[1], file);
+      hseedposdiff[2] = getHisto(hseedposdiff[2], file);
 
-    hseedposdiff[0] = getHisto("hseedposdiff_x", file);
-    hseedposdiff[1] = getHisto("hseedposdiff_y", file);
-    hseedposdiff[2] = getHisto("hseedposdiff_z", file);
+      hfitpos[0] = getHisto(hfitpos[0], file);
+      hfitpos[1] = getHisto(hfitpos[1], file);
+      hfitpos[2] = getHisto(hfitpos[2], file);
 
-    hfitpos[0] = getHisto("hfitpos_x", file);
-    hfitpos[1] = getHisto("hfitpos_y", file);
-    hfitpos[2] = getHisto("hfitpos_z", file);
+      hfitposdiff[0] = getHisto(hfitposdiff[0], file);
+      hfitposdiff[1] = getHisto(hfitposdiff[1], file);
+      hfitposdiff[2] = getHisto(hfitposdiff[2], file);
 
-    hfitposdiff[0] = getHisto("hfitposdiff_x", file);
-    hfitposdiff[1] = getHisto("hfitposdiff_y", file);
-    hfitposdiff[2] = getHisto("hfitposdiff_z", file);
+      // Prompts
+      hprompt_nhits = getHisto(hprompt_nhits, file);
+      hprompt_nrings = getHisto(hprompt_nrings, file);
+      hprompt_pid = getHisto(hprompt_pid, file);
+      hprompt_eeffenergy = getHisto(hprompt_eeffenergy, file);
+      hprompt_ueffenergy = getHisto(hprompt_ueffenergy, file);
+      hprompt_meffenergy = getHisto(hprompt_meffenergy, file);
 
-    // Prompts
-    hprompt_nhits = getHisto("hprompt_nhits", file);
-    hprompt_nrings = getHisto("hprompt_nrings", file);
-    hprompt_pid = getHisto("hprompt_pid", file);
-    hprompt_eeffenergy = getHisto("hprompt_eeffenergy", file);
-    hprompt_ueffenergy = getHisto("hprompt_ueffenergy", file);
-    hprompt_meffenergy = getHisto("hprompt_meffenergy", file);
+      // Michel e
+      hmichele_nhits = getHisto(hmichele_nhits, file);
+      hmichele_deltat = getHisto(hmichele_deltat, file);
+      hmichele_energy0 = getHisto(hmichele_energy0, file);
+      hmichele_energy1 = getHisto(hmichele_energy1, file);
+      hmichele_energy2 = getHisto(hmichele_energy2, file);
 
-    // Michel e
-    hmichele_nhits = getHisto("hmichele_nhits", file);
-    hmichele_deltat = getHisto("hmichele_deltat", file);
-    hmichele_energy0 = getHisto("hmichele_energy0", file);
-    hmichele_energy1 = getHisto("hmichele_energy1", file);
-    hmichele_energy2 = getHisto("hmichele_energy2", file);
+      // Neutrons
+      hfollowers_nhits = getHisto(hfollowers_nhits, file);
+      hfollowers_deltat = getHisto(hfollowers_deltat, file);
+      hfollowers_energy0 = getHisto(hfollowers_energy0, file);
+      hfollowers_energy1 = getHisto(hfollowers_energy1, file);
+      hfollowers_energy2 = getHisto(hfollowers_energy2, file);
+      hfollowers_dist = getHisto(hfollowers_dist, file);
+      nfollowers_tot = getHisto(nfollowers_tot, file);
+      nfollowers_sring = getHisto(nfollowers_sring, file);
+      nfollowers_mring = getHisto(nfollowers_mring, file);
 
-    // Neutrons
-    hfollowers_nhits = getHisto("hfollowers_nhits", file);
-    hfollowers_deltat = getHisto("hfollowers_deltat", file);
-    hfollowers_energy0 = getHisto("hfollowers_energy0", file);
-    hfollowers_energy1 = getHisto("hfollowers_energy1", file);
-    hfollowers_energy2 = getHisto("hfollowers_energy2", file);
-    hfollowers_dist = getHisto("hfollowers_dist", file);
-    nfollowers_tot = getHisto("nfollowers_tot", file);
-    nfollowers_sring = getHisto("nfollowers_sring", file);
-    nfollowers_mring = getHisto("nfollowers_mring", file);
-    nhit_nofollow_tot = getHisto("nhit_nofollow_tot", file);
-    nhit_nofollow_sring = getHisto("nhit_nofollow_sring", file);
-    nhit_nofollow_mring = getHisto("nhit_nofollow_mring", file);
-    nfollowers_eeffenergy = get2DHisto("nfollowers_eeffenergy", file);
-    nfollowersmean_eeffenergy = getHisto("nfollowersmean_eeffenergy", file);
-    nfollowersmean_eeffenergy_norm = getHisto("nfollowersmean_eeffenergy_norm", file);
-    nfollowers_sr_eeffenergy = get2DHisto("nfollowers_sr_eeffenergy", file);
-    nfollowersmean_sr_eeffenergy = getHisto("nfollowersmean_sr_eeffenergy", file);
-    nfollowersmean_sr_eeffenergy_norm = getHisto("nfollowersmean_sr_eeffenergy_norm", file);
-    nfollowers_mr_eeffenergy = get2DHisto("nfollowersmean_mr_eeffenergy", file);
-    nfollowersmean_mr_eeffenergy = getHisto("nfollowersmean_mr_eeffenergy", file);
-    nfollowersmean_mr_eeffenergy_norm = getHisto("nfollowersmean_mr_eeffenergy_norm", file);
+      nhit_nofollow_tot = getHisto(nhit_nofollow_tot, file);
+      nhit_nofollow_sring = getHisto(nhit_nofollow_sring, file);
+      nhit_nofollow_mring = getHisto(nhit_nofollow_mring, file);
 
+      nfollowers_eeffenergy = get2DHisto(nfollowers_eeffenergy, file);
+      nfollowersmean_eeffenergy = getHisto(nfollowersmean_eeffenergy, file);
+      nfollowersmean_eeffenergy_norm = getHisto(nfollowersmean_eeffenergy_norm, file);
+      nfollowers_sr_eeffenergy = get2DHisto(nfollowers_sr_eeffenergy, file);
+      nfollowersmean_sr_eeffenergy = getHisto(nfollowersmean_sr_eeffenergy, file);
+      nfollowersmean_sr_eeffenergy_norm = getHisto(nfollowersmean_sr_eeffenergy_norm, file);
+      nfollowers_mr_eeffenergy = get2DHisto(nfollowers_mr_eeffenergy, file);
+      nfollowersmean_mr_eeffenergy = getHisto(nfollowersmean_mr_eeffenergy, file);
+      nfollowersmean_mr_eeffenergy_norm = getHisto(nfollowersmean_mr_eeffenergy_norm, file);
+    }
 }
 
 /** Default constructor. Will make all necessary histograms
  *  from scratch. */
-HistogramMaker::HistogramMaker() {
+HistogramMaker::HistogramInitializer() {
 
     this->hists = new std::vector<TH1*>();
-
+    std::cout << "Made vector" << std::endl;
     hseedpos[0] = new TH1F("hseedpos_x","Seed Position X; Seed position X (mm); Number of events per bin",200,-9000,9000);
+    std::cout << "hseedpos" << hseedpos[0] << std::endl;
     hists.push_back(hseedpos[0]);
+    std::cout << "hseedpos" << hseedpos[0] << std::endl;
+    
     hseedpos[1] = new TH1F("hseedpos_y","Seed Position Y; Seed position Y (mm); Number of events per bin",200,-9000,9000);
     hists.push_back(hseedpos[1]);
     hseedpos[2] = new TH1F("hseedpos_z","Seed Position Z; Seed position Z (mm); Number of events per bin",200,-9000,9000);
@@ -208,10 +222,24 @@ HistogramMaker::HistogramMaker() {
 /** Write all the histograms to the ROOT file
  *  @param file File to which histograms produced by
  *              this object are written to. */
+void HistogramMaker::writeAllToFileVec(TFile* file)
+{
+   for (unsigned i =0; i < hists.size(); i++) {
+       //if ((hists1.at(i)->IsA() == TH1F::Class() && hists2.at(i)->IsA() == TH1F::Class()) ||
+       //  TH1F* h1 = (TH1F*) hists.at(i);
+       file->WriteTObject(hists.at(i));
+   }
+
+}
+/** Write all the histograms to the ROOT file
+ *  @param file File to which histograms produced by
+ *              this object are written to. */
 void HistogramMaker::writeAllToFile(TFile* file)
 {
     for (int i = 0; i < 3; i++) {
+        std::cout << "Writing seed pos 1" << std::endl;
         file->WriteTObject(hseedpos[i]);
+        std::cout << "Wrote seed pos 0" << std::endl;
         file->WriteTObject(hseedposdiff[i]);
         file->WriteTObject(hfitpos[i]);
         file->WriteTObject(hfitposdiff[i]);
