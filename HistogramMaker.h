@@ -52,6 +52,8 @@ public:
     TH1F* nfollowersmean_mr_eeffenergy;
     TH1F* nfollowersmean_mr_eeffenergy_norm;
 
+    std::vector<TH1*> hists;
+
     HistogramMaker();
     HistogramMaker(TFile* file);
     void writeAllToFile(TFile* file);
