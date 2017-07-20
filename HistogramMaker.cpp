@@ -172,7 +172,7 @@ HistogramMaker::HistogramInitializer() {
     hmichele_energy2 = new TH1F("hmichele_energy2","FTK Energy Michel-e; FTK Energy (MeV); Number of Michel electron events",30,0,100);
 
     // Neutrons
-    hfollowers_nhits = new TH1F("hfollowers_nhits","NHits Neutron Followers; NHit; Number of neutron events",100,0,1000);
+    hfollowers_nhits = new TH1F("hfollowers_nhits","NHits Neutron Followers; NHit; Number of neutron events",20,0,100);
     hfollowers_deltat = new TH1F("hfollowers_deltat","DeltaT Neutron Followers; Prompt-follower time difference (s); Number of neutron events",30,0,.25);
     hfollowers_energy0 = new TH1F("hfollowers_energy0","WaterFitter Energy Neutron Followers; WaterFitter Energy (MeV); Number of neutron events",15,3,10.5);
     hfollowers_energy1 = new TH1F("hfollowers_energy1","Alt. Fitter Corrected Energy Neutron Followers; Alt. Fitter Energy (MeV); Number of neutron events",15,3,10.5);

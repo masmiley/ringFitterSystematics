@@ -278,12 +278,7 @@ void HistogramMerger::makeHistograms()
     _outFile->WriteTObject(cnfollowmean_eeffenergy);
 
     // Write histograms to output file for later use - i.e. superimposing data and MC
-    _outFile->WriteTObject(histsNominal->hprompt_eeffenergy);
-    _outFile->WriteTObject(histsNominal->hprompt_ueffenergy);
-    _outFile->WriteTObject(histsNominal->hprompt_meffenergy);
-    _outFile->WriteTObject(histsNominal->nfollowersmean_eeffenergy);
-    _outFile->WriteTObject(histsNominal->nfollowersmean_sr_eeffenergy);
-    _outFile->WriteTObject(histsNominal->nfollowersmean_mr_eeffenergy);
+    histsNominal->writeAllToFileVec(_outFile);
 
     _outFile->Close();
 

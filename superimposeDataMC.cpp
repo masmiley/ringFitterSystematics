@@ -40,10 +40,9 @@ void superimposeDataMC(std::string nameMC, std::string nameDATA)
     TFile* mcFile = new TFile(nameMC.c_str(), "open");
     TFile* dataFile = new TFile(nameDATA.c_str(), "open");
     TFile* combinedPlot = new TFile("FinalPlots.root", "recreate");
-    TFile* outF = new TFile("whatever.root", "recreate");
-
+    TFile* outF = new TFile("AllPlots.root", "recreate");
     HistogramOverlayer* over = new HistogramOverlayer(mcFile, dataFile, outF);
-    over->makeHistograms(); 
+    over->makeHistograms();
 
     TCanvas* cprompts = new TCanvas("cprompts","Prompt Distributions", 1600, 800);
     cprompts->Divide(3, 1);

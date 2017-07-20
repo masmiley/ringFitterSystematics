@@ -46,19 +46,25 @@ void HistogramOverlayer::makeHistograms()
           hMC->Scale(1./hMC->Integral(), "width");
         }
         c1->SetName(hData->GetName());
-        hData->SetName((string(hData->GetName())+string("data")).c_str());      
-        hMC->SetName((string(hMC->GetName())+string("mc")).c_str());      
-        hData->SetTitle((string(hData->GetTitle())+string("data")).c_str());      
-        hMC->SetTitle((string(hMC->GetTitle())+string("mc")).c_str());      
+        hData->SetName((string(hData->GetName())+string("data")).c_str());
+        hMC->SetName((string(hMC->GetName())+string("mc")).c_str());
+        hData->SetTitle((string(hData->GetTitle())+string(" Data")).c_str());
+        hMC->SetTitle((string(hMC->GetTitle())+string(" MC")).c_str());
 
         TPaveStats *st1;
         TPaveStats *st2; 
         if (hMC->GetMaximum() >= hData->GetMaximum()) {
           c1->cd();
-          if ((string(hData->GetName())).find("nfollowers") == std::string::npos && (string(hData->GetName())).find("eeffenergy") == std::string::npos) {
+          if ((string(hData->GetName())).find("nfollowers") != std::string::npos && (string(hData->GetName())).find("eeffenergy") != std::string::npos) {
+            hMC->SetFillColor(kRed);
+            hMC->SetFillStyle(3001);
+            hMC->Draw("e2");
             c1->SetLogx();
           }
-          hMC->Draw("hist");
+          else {
+            c1->SetLogx(0);
+            hMC->Draw("hist");
+          }
           c1->Modified();
           c1->Update();
           st1 = (TPaveStats*) c1->GetPrimitive("stats");
@@ -71,15 +77,22 @@ void HistogramOverlayer::makeHistograms()
         }
         else {
           c1->cd();
-          if ((string(hData->GetName())).find("nfollowers") == std::string::npos && (string(hData->GetName())).find("eeffenergy") == std::string::npos) {
+          std::string mcstyle;
+          if ((string(hData->GetName())).find("nfollowers") != std::string::npos && (string(hData->GetName())).find("eeffenergy") != std::string::npos) {
+            hMC->SetFillStyle(3001);
             c1->SetLogx();
+            mcstyle = "e2sames";
+          }
+          else {
+            c1->SetLogx(0);
+            mcstyle = "histsames";
           }
           hData->Draw("e1");
           c1->Modified();
           c1->Update();
           st2 = (TPaveStats*) c1->GetPrimitive("stats");
           st2->SetName((string(st2->GetName())+string(hData->GetName())).c_str());
-          hMC->Draw("histsames");
+          hMC->Draw(mcstyle.c_str());
           c1->Modified();
           c1->Update();
           st1 = (TPaveStats*) c1->GetPrimitive("stats");
@@ -110,14 +123,24 @@ void HistogramOverlayer::makeHistograms()
       else if (histsData->hists.at(i)->IsA() == TH2F::Class() && histsMC->hists.at(i)->IsA() == TH2F::Class()) {
         TH2F* h2Data = (TH2F*) histsData->hists.at(i);
         TH2F* h2MC = (TH2F*) histsMC->hists.at(i);
-        if ((string(hData->GetName())).find("nfollowers") == std::string::npos && (string(hData->GetName())).find("eeffenergy") == std::string::npos) {
+        c1->SetName(h2Data->GetName());
+        c2->SetName(h2MC->GetName());
+        h2Data->SetName((string(h2Data->GetName())+string("data")).c_str());
+        h2MC->SetName((string(h2MC->GetName())+string("mc")).c_str());
+        h2Data->SetTitle((string(h2Data->GetTitle())+string(" Data")).c_str());
+        h2MC->SetTitle((string(h2MC->GetTitle())+string(" MC")).c_str());
+        if ((string(h2Data->GetName())).find("nfollowers") != std::string::npos && (string(h2Data->GetName())).find("eeffenergy") != std::string::npos) {
           c1->SetLogx();
           c2->SetLogx();
         }
+        else {
+          c1->SetLogx(0);
+          c2->SetLogx(0);
+        }
         c1->cd();
-        h2Data->Draw();
+        h2Data->Draw("colz");
         c2->cd();
-        h2MC->Draw();
+        h2MC->Draw("colz");
         if (i == 0) {
           c1->Print((pdffilename+string("(")).c_str(), "pdf");
           c2->Print(pdffilename.c_str(), "pdf");
@@ -134,7 +157,7 @@ void HistogramOverlayer::makeHistograms()
         c2->Clear();
       }
       else if (i == histsMC->hists.size() - 1) {
-          c1->Print((pdffilename+string("]")).c_str(), "pdf");
+         c1->Print((pdffilename+string("]")).c_str(), "pdf");
     
       }
     }
