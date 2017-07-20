@@ -83,7 +83,8 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
             ftkDist > 6000.0 ||
             rFitEv->followers_energy[ifol][0] <= 4.0 ||
-            rFitEv->followers_ftkitr[ifol] <= 0.5);
+            rFitEv->followers_ftkitr[ifol] <= 0.5 ||
+            !(rFitEv->followers_fit[0]));
 }
 
 
@@ -262,13 +263,13 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
             histograms->hfollowers_energy0->Fill(followers_energy[ifol][0]);
             histograms->hfollowers_energy1->Fill(followers_energy[ifol][1]);
             histograms->hfollowers_energy2->Fill(followers_energy[ifol][2]);
-            histograms->hfollowers_dist->Fill(sqrt(pow((followers_wpos_fX[ifol] - wpos_fX),2) +
-                                                   pow((followers_wpos_fY[ifol] - wpos_fY),2) +
-                                                   pow((followers_wpos_fZ[ifol] - wpos_fZ),2)));
+            histograms->hfollowers_dist->Fill(sqrt(pow((followers_ftkpos_fX[ifol] - wpos_fX),2) +
+                                                   pow((followers_ftkpos_fY[ifol] - wpos_fY),2) +
+                                                   pow((followers_ftkpos_fZ[ifol] - wpos_fZ),2)));
 
-            double xPos = followers_wpos_fX[ifol];
-            double yPos = followers_wpos_fY[ifol];
-            double zPos = followers_wpos_fZ[ifol];
+            double xPos = followers_ftkpos_fX[ifol];
+            double yPos = followers_ftkpos_fY[ifol];
+            double zPos = followers_ftkpos_fZ[ifol];
             double followerFTK = followers_energy[ifol][2];
 
 
