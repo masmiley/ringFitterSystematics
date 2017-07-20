@@ -1,5 +1,10 @@
 #include <string> 
 #include <iostream>
+#include <vector>
+#include <TH1.h>
+#ifdef __MAKECINT__
+#pragma link C++ class std::vector<TH1*>;
+#endif
 void runAll(std::string dataName, std::string mcName) {
  gROOT->SetBatch(kTRUE);
  gROOT->ProcessLine(".L Systematic.cpp");
@@ -7,6 +12,7 @@ void runAll(std::string dataName, std::string mcName) {
  gROOT->ProcessLine(".L LowScaleSystematics.cpp");
  gROOT->ProcessLine(".L HistogramMaker.cpp");
  gROOT->ProcessLine(".L HistogramMerger.cpp");
+ gROOT->ProcessLine(".L HistogramOverlayer.cpp");
  std::string dataCommand = ".x loop.cc(true, \"" + dataName + "\")";
  std::cout << dataCommand << std::endl;
  gROOT->ProcessLine(dataCommand.c_str());

@@ -113,7 +113,7 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
     fileName += ".root";
 
     TFile* outf = new TFile(fileName.c_str(), "recreate");
-    HistogramMaker* histograms = new HistogramMaker();
+    HistogramMaker* histograms = new HistogramMaker(0);
 
     if (fChain == 0) return;
 

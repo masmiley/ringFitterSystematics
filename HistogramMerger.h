@@ -31,4 +31,4 @@ class HistogramMerger {
 };
 
 
-#endif //HIGHANDLOW_HISTOGRAMMERGER_H
+#endif
