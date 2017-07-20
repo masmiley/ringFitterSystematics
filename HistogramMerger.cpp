@@ -8,12 +8,13 @@
 #include "HistogramMerger.h"
 #include "HistogramMaker.h"
 
-HistogramMerger::HistogramMerger(TFile* nomFile, TFile* upFile, TFile* lowFile, TFile* outFile)
+HistogramMerger::HistogramMerger(TFile* nomFile, TFile* upFile, TFile* lowFile, TFile* outFile, bool useData)
 {
     _nomFile = nomFile;
     _upFile = upFile;
     _lowFile = lowFile;
     _outFile = outFile;
+    _data = useData;
 }
 
 /** Applies bin error correction to a nominal histogram, changing its bin errors
@@ -81,6 +82,33 @@ void HistogramMerger::mergeNormDivisionHistograms(TH1F* nominal, TH1F* upper, TH
     this->mergeHistograms(nominal, upper, lower, canv);
 }
 
+void HistogramMerger::plotPromptHistogram(TH1F* nominal, TH1F* upper, TH1F* lower, TCanvas* canv)
+{
+
+    if (_data) {
+        TCanvas* c = canv;
+        nominal->Draw("e1");
+    } else {
+        this->mergeHistograms(nominal, upper, lower, canv);
+    }
+}
+
+void HistogramMerger::plotMeanFollowerHistogram(TH1F *nominal, TH1F *upper, TH1F *lower, TH1F *nominalNorm,
+                                                TH1F *upperNorm, TH1F *lowerNorm, TCanvas *canv)
+{
+    if (_data) {
+        TCanvas* c = canv;
+        nominal->Sumw2();
+        nominalNorm->Sumw2();
+        nominal->Divide(nominalNorm);
+        nominal->Draw("e1");
+    } else {
+        this->mergeNormDivisionHistograms(nominal, upper, lower,
+                                          nominalNorm, upperNorm, lowerNorm,
+                                          canv);
+    }
+}
+
 
 /** Main method, makes all histograms and draws them on
  *  canvases. Saves canvases to _outFile for later access. Applies
@@ -132,20 +160,21 @@ void HistogramMerger::makeHistograms()
     cprompt->cd(3);
     histsNominal->hprompt_pid->Draw("e1");
     cprompt->cd(4);
-    mergeHistograms(histsNominal->hprompt_eeffenergy,
-                    histsUpper->hprompt_eeffenergy,
-                    histsLower->hprompt_eeffenergy,
-                    cprompt);
+    plotPromptHistogram(histsNominal->hprompt_eeffenergy,
+                        histsUpper->hprompt_eeffenergy,
+                        histsLower->hprompt_eeffenergy,
+                        cprompt);
+
     cprompt->cd(5);
-    mergeHistograms(histsNominal->hprompt_ueffenergy,
-                    histsUpper->hprompt_ueffenergy,
-                    histsLower->hprompt_ueffenergy,
-                    cprompt);
+    plotPromptHistogram(histsNominal->hprompt_ueffenergy,
+                        histsUpper->hprompt_ueffenergy,
+                        histsLower->hprompt_ueffenergy,
+                        cprompt);
     cprompt->cd(6);
-    mergeHistograms(histsNominal->hprompt_meffenergy,
-                    histsUpper->hprompt_meffenergy,
-                    histsLower->hprompt_meffenergy,
-                    cprompt);
+    plotPromptHistogram(histsNominal->hprompt_meffenergy,
+                        histsUpper->hprompt_meffenergy,
+                        histsLower->hprompt_meffenergy,
+                        cprompt);
     cprompt->Update();
 
     TCanvas* cmichele = new TCanvas("cmichele","Michel-e Distributions",900,600);
@@ -202,38 +231,38 @@ void HistogramMerger::makeHistograms()
     cnfollowmean_eeffenergy->Divide(2,3);
     cnfollowmean_eeffenergy->cd(1);
     cnfollowmean_eeffenergy->cd(1)->SetLogx();
-    this->mergeNormDivisionHistograms(histsNominal->nfollowersmean_eeffenergy,
-                                      histsUpper->nfollowersmean_eeffenergy,
-                                      histsLower->nfollowersmean_eeffenergy,
-                                      histsNominal->nfollowersmean_eeffenergy_norm,
-                                      histsUpper->nfollowersmean_eeffenergy_norm,
-                                      histsLower->nfollowersmean_eeffenergy_norm,
-                                      cnfollowmean_eeffenergy);
+    this->plotMeanFollowerHistogram(histsNominal->nfollowersmean_eeffenergy,
+                                    histsUpper->nfollowersmean_eeffenergy,
+                                    histsLower->nfollowersmean_eeffenergy,
+                                    histsNominal->nfollowersmean_eeffenergy_norm,
+                                    histsUpper->nfollowersmean_eeffenergy_norm,
+                                    histsLower->nfollowersmean_eeffenergy_norm,
+                                    cnfollowmean_eeffenergy);
 
     cnfollowmean_eeffenergy->cd(2);
     cnfollowmean_eeffenergy->cd(2)->SetLogx();
     histsNominal->nfollowers_eeffenergy->Draw("colz");
     cnfollowmean_eeffenergy->cd(3);
     cnfollowmean_eeffenergy->cd(3)->SetLogx();
-    this->mergeNormDivisionHistograms(histsNominal->nfollowersmean_sr_eeffenergy,
-                                      histsUpper->nfollowersmean_sr_eeffenergy,
-                                      histsLower->nfollowersmean_sr_eeffenergy,
-                                      histsNominal->nfollowersmean_sr_eeffenergy_norm,
-                                      histsUpper->nfollowersmean_sr_eeffenergy_norm,
-                                      histsLower->nfollowersmean_sr_eeffenergy_norm,
-                                      cnfollowmean_eeffenergy);
+    this->plotMeanFollowerHistogram(histsNominal->nfollowersmean_sr_eeffenergy,
+                                    histsUpper->nfollowersmean_sr_eeffenergy,
+                                    histsLower->nfollowersmean_sr_eeffenergy,
+                                    histsNominal->nfollowersmean_sr_eeffenergy_norm,
+                                    histsUpper->nfollowersmean_sr_eeffenergy_norm,
+                                    histsLower->nfollowersmean_sr_eeffenergy_norm,
+                                    cnfollowmean_eeffenergy);
     cnfollowmean_eeffenergy->cd(4);
     cnfollowmean_eeffenergy->cd(4)->SetLogx();
     histsNominal->nfollowers_sr_eeffenergy->Draw("colz");
     cnfollowmean_eeffenergy->cd(5);
     cnfollowmean_eeffenergy->cd(5)->SetLogx();
-    this->mergeNormDivisionHistograms(histsNominal->nfollowersmean_mr_eeffenergy,
-                                      histsUpper->nfollowersmean_mr_eeffenergy,
-                                      histsLower->nfollowersmean_mr_eeffenergy,
-                                      histsNominal->nfollowersmean_mr_eeffenergy_norm,
-                                      histsUpper->nfollowersmean_mr_eeffenergy_norm,
-                                      histsLower->nfollowersmean_mr_eeffenergy_norm,
-                                      cnfollowmean_eeffenergy);
+    this->plotMeanFollowerHistogram(histsNominal->nfollowersmean_mr_eeffenergy,
+                                    histsUpper->nfollowersmean_mr_eeffenergy,
+                                    histsLower->nfollowersmean_mr_eeffenergy,
+                                    histsNominal->nfollowersmean_mr_eeffenergy_norm,
+                                    histsUpper->nfollowersmean_mr_eeffenergy_norm,
+                                    histsLower->nfollowersmean_mr_eeffenergy_norm,
+                                    cnfollowmean_eeffenergy);
     cnfollowmean_eeffenergy->cd(6);
     cnfollowmean_eeffenergy->cd(6)->SetLogx();
     histsNominal->nfollowers_mr_eeffenergy->Draw("colz");

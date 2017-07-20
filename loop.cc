@@ -23,7 +23,7 @@ void loop(bool USEDATA, std::string fName) {
     TFile* lowerFile = new TFile("MC_CombinedSystematicLower.root", "open");
     TFile* outFile = new TFile(outname.c_str(), "recreate");
  
-    HistogramMerger* merge = new HistogramMerger(nominalFile, upperFile, lowerFile, outFile);
+    HistogramMerger* merge = new HistogramMerger(nominalFile, upperFile, lowerFile, outFile, USEDATA);
     merge->makeHistograms();
 
     nominalFile->Close();
