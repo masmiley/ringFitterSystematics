@@ -66,4 +66,4 @@ private:
 };
 
 
-#endif //COMBINEDSYSTEMATIC_HISTOGRAMMAKER_H
+#endif
