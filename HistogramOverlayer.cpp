@@ -33,7 +33,6 @@ void HistogramOverlayer::makeHistograms()
 
     if (histsData->hists.size() != histsMC->hists.size()) return;
     for (unsigned i =0; i < histsData->hists.size(); i++) {
-      std::cout << "Hist: " << histsData->hists.at(i)->GetName() << std::endl;
       if (histsData->hists.at(i)->IsA() == TH1F::Class() && histsMC->hists.at(i)->IsA() == TH1F::Class()) {
         TH1F* hData = (TH1F*) histsData->hists.at(i);
         TH1F* hMC = (TH1F*) histsMC->hists.at(i);
@@ -68,17 +67,13 @@ void HistogramOverlayer::makeHistograms()
           st2->SetName((string(st2->GetName())+string(hData->GetName())).c_str());
         }
         else {
-          std::cout << "Data bigger" << std::endl;
           c1->cd();
           hData->Draw("e1");
           c1->Modified();
           c1->Update();
-          std::cout << "Drew data" << std::endl; 
           st2 = (TPaveStats*) c1->GetPrimitive("stats");
-          std::cout << "Got stats: " << st2 << std::endl;
           st2->SetName((string(st2->GetName())+string(hData->GetName())).c_str());
           hMC->Draw("histsames");
-          std::cout << "Drew MC" << std::endl;
           c1->Modified();
           c1->Update();
           st1 = (TPaveStats*) c1->GetPrimitive("stats");
