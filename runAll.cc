@@ -1,6 +1,7 @@
 #include <string> 
 #include <iostream>
 void runAll(std::string dataName, std::string mcName) {
+ gROOT->SetBatch(kTRUE);
  gROOT->ProcessLine(".L Systematic.cpp");
  gROOT->ProcessLine(".L HighScaleSystematics.cpp");
  gROOT->ProcessLine(".L LowScaleSystematics.cpp");

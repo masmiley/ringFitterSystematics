@@ -83,7 +83,8 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
             ftkDist > 6000.0 ||
             rFitEv->followers_energy[ifol][0] <= 4.0 ||
-            rFitEv->followers_ftkitr[ifol] <= 0.5);
+            rFitEv->followers_ftkitr[ifol] <= 0.5 ||
+            !(rFitEv->followers_fit[0]));
 }
 
 
