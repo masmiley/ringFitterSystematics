@@ -207,6 +207,7 @@ public :
    Double_t        followers_wdir_fY[kMaxfollowers];   //[followers_]
    Double_t        followers_wdir_fZ[kMaxfollowers];   //[followers_]
    Double_t        followers_itr[kMaxfollowers];   //[followers_]
+   Double_t        followers_ftkitr[kMaxfollowers]; //[followers_]
    Double_t        followers_qpdt[kMaxfollowers];   //[followers_]
    Double_t        followers_nearly[kMaxfollowers];   //[followers_]
    Double_t        followers_totalq[kMaxfollowers];   //[followers_]
@@ -517,6 +518,7 @@ public :
    TBranch        *b_followers_wdir_fY;   //!
    TBranch        *b_followers_wdir_fZ;   //!
    TBranch        *b_followers_itr;   //!
+   TBranch        *b_followers_ftkitr; //!
    TBranch        *b_followers_qpdt;   //!
    TBranch        *b_followers_nearly;   //!
    TBranch        *b_followers_totalq;   //!
@@ -644,7 +646,7 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-   virtual void     Loop(int USEWATER, int dir);
+   virtual void     Loop(int USEWATER, int dir, bool data);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 };
@@ -887,12 +889,16 @@ void RingFitterEvent::Init(TTree *tree)
    fChain->SetBranchAddress("followers.wpos.fX", followers_wpos_fX, &b_followers_wpos_fX);
    fChain->SetBranchAddress("followers.wpos.fY", followers_wpos_fY, &b_followers_wpos_fY);
    fChain->SetBranchAddress("followers.wpos.fZ", followers_wpos_fZ, &b_followers_wpos_fZ);
+   fChain->SetBranchAddress("followers.ftkpos.fX", followers_ftkpos_fX, &b_followers_ftkpos_fX);
+   fChain->SetBranchAddress("followers.ftkpos.fY", followers_wpos_fY, &b_followers_wpos_fY);
+   fChain->SetBranchAddress("followers.ftkpos.fZ", followers_wpos_fZ, &b_followers_wpos_fZ);
    fChain->SetBranchAddress("followers.wdir.fUniqueID", followers_wdir_fUniqueID, &b_followers_wdir_fUniqueID);
    fChain->SetBranchAddress("followers.wdir.fBits", followers_wdir_fBits, &b_followers_wdir_fBits);
    fChain->SetBranchAddress("followers.wdir.fX", followers_wdir_fX, &b_followers_wdir_fX);
    fChain->SetBranchAddress("followers.wdir.fY", followers_wdir_fY, &b_followers_wdir_fY);
    fChain->SetBranchAddress("followers.wdir.fZ", followers_wdir_fZ, &b_followers_wdir_fZ);
    fChain->SetBranchAddress("followers.itr", followers_itr, &b_followers_itr);
+   fChain->SetBranchAddress("followers.ftkitr", followers_ftkitr, &b_followers_ftkitr);
    fChain->SetBranchAddress("followers.qpdt", followers_qpdt, &b_followers_qpdt);
    fChain->SetBranchAddress("followers.nearly", followers_nearly, &b_followers_nearly);
    fChain->SetBranchAddress("followers.totalq", followers_totalq, &b_followers_totalq);

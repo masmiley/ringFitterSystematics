@@ -90,8 +90,6 @@ double LowScaleSystematics::getwMinus(double energy)
     return (1. + (_sysEdepFidVolDown/100.) * (energy - 5.05));
 }
 
-
-
 /** Applies the position systematic scaling (for scale XYZ/Z in sec. 2.11.5)
  * @param var The variable being scaled
  * @param param The systematic parameter corresponding to the scaling

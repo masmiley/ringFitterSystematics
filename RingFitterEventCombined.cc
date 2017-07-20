@@ -35,9 +35,9 @@ const double sysEdepFidVolDown = -0.49;
 
 /* Systematic Flags */
 // Edep. Fid. Vol. flag
-#define edepFidVol true;
+const bool edepFidVol = true;
 // High Energy Flag
-#define highEnergy true;
+const bool highEnergy = true;
 // High Energy Shift
 const double highEnergyShift = TMath::Abs(37.23 - 38.75)/37.23;
 
@@ -49,7 +49,7 @@ const double highEnergyShift = TMath::Abs(37.23 - 38.75)/37.23;
  *  @param x x coordinate.
  *  @param y y coordinate.
  *  @param z z coordinate.
- *  @return x^2 + y^2 + z^2*/
+ *  @return x^2 + y^2 + z^2 */
 double norm(double x, double y, double z)
 {
     return (x * x) + (y * y) + (z * z);
@@ -62,10 +62,10 @@ double norm(double x, double y, double z)
  *  @return true if the conditions of the Michel E cut are met. */
 bool micheleCut(int ifol, RingFitterEvent* rFitEv)
 {
-    return rFitEv->followers_nhit[ifol]>100
-           && rFitEv->followers_deltat[ifol] > 800e-9
-           && rFitEv->followers_deltat[ifol] < 20e-6
-           && (rFitEv->followers_datacleaning2[ifol] & 0x100000) == 0x0;
+    return rFitEv->followers_nhit[ifol]>100 &&
+           rFitEv->followers_deltat[ifol] > 800e-9 &&
+           rFitEv->followers_deltat[ifol] < 20e-6 &&
+           (rFitEv->followers_datacleaning2[ifol] & 0x100000) == 0x0;
 }
 
 /** Applies the Neutron Cuts
@@ -75,14 +75,16 @@ bool micheleCut(int ifol, RingFitterEvent* rFitEv)
  *  @return true if the conditions of the Neutron cut are met.*/
 bool neutronCut(int ifol, RingFitterEvent* rFitEv)
 {
-    return (rFitEv->followers_deltat[ifol] <= 20e-6 ||
+    double ftkDist = sqrt(rFitEv->followers_ftkpos_fX[ifol] * rFitEv->followers_ftkpos_fX[ifol] +
+                          rFitEv->followers_ftkpos_fY[ifol] * rFitEv->followers_ftkpos_fY[ifol] +
+                          rFitEv->followers_ftkpos_fZ[ifol] * rFitEv->followers_ftkpos_fZ[ifol]);
+    return (rFitEv->followers_deltat[ifol] <= 20e-6  ||
             rFitEv->followers_deltat[ifol] >= 250e-3 ||
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
-             sqrt(rFitEv->followers_wpos_fX[ifol] * rFitEv->followers_wpos_fX[ifol]
-             + rFitEv->followers_wpos_fY[ifol] * rFitEv->followers_wpos_fY[ifol]
-             + rFitEv->followers_wpos_fZ[ifol] * rFitEv->followers_wpos_fZ[ifol]) > 6000.0 ||
-             rFitEv->followers_energy[ifol][0] <= 4.0 ||
-             double(rFitEv->followers_intime[ifol][0])/double(rFitEv->followers_nhit[ifol]) <= 0.5);
+            ftkDist > 6000.0 ||
+            rFitEv->followers_energy[ifol][0] <= 4.0 ||
+            rFitEv->followers_ftkitr[ifol] <= 0.5 ||
+            !(rFitEv->followers_fit[0]));
 }
 
 
@@ -92,8 +94,9 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
  *  where XXX is either Nominal, Lower, or Upper depending on dir.
  *  @param USEWATER Whether to use D2O settings.
  *  @param dir The direction of the systematics applied.
- *              1 for upper, -1 for lower, 0 for nominal. */
-void RingFitterEvent::Loop(int USEWATER, int dir)
+ *             1 for upper, -1 for lower, 0 for nominal.
+ *  @param data True if using data, false if using MC. */
+void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
 {
     std::string fileName = "MC_CombinedSystematic";
     std::string dirError = "Incorrect Direction For Loop, must be +1, -1, or 0";
@@ -254,18 +257,19 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
 
             // Neutron Cuts
             if (neutronCut(ifol, this)) continue;
+
             histograms->hfollowers_nhits->Fill(followers_nhit[ifol]);
             histograms->hfollowers_deltat->Fill(followers_deltat[ifol]);
             histograms->hfollowers_energy0->Fill(followers_energy[ifol][0]);
             histograms->hfollowers_energy1->Fill(followers_energy[ifol][1]);
             histograms->hfollowers_energy2->Fill(followers_energy[ifol][2]);
-            histograms->hfollowers_dist->Fill(sqrt(pow((followers_wpos_fX[ifol] - wpos_fX),2) +
-                                                   pow((followers_wpos_fY[ifol] - wpos_fY),2) +
-                                                   pow((followers_wpos_fZ[ifol] - wpos_fZ),2)));
+            histograms->hfollowers_dist->Fill(sqrt(pow((followers_ftkpos_fX[ifol] - wpos_fX),2) +
+                                                   pow((followers_ftkpos_fY[ifol] - wpos_fY),2) +
+                                                   pow((followers_ftkpos_fZ[ifol] - wpos_fZ),2)));
 
-            double xPos = followers_wpos_fX[ifol];
-            double yPos = followers_wpos_fY[ifol];
-            double zPos = followers_wpos_fZ[ifol];
+            double xPos = followers_ftkpos_fX[ifol];
+            double yPos = followers_ftkpos_fY[ifol];
+            double zPos = followers_ftkpos_fZ[ifol];
             double followerFTK = followers_energy[ifol][2];
 
 
@@ -278,7 +282,7 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
             double ySystematic;
             double zSystematic;
 
-            TF1* nominalEnergyFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.154)",
+            TF1* nominalEnergyFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.155)",
                                              lowEnergyDelta - 10, lowEnergyDelta + 10);
             TF1* energySmearingFunc;
 
@@ -293,14 +297,14 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
                     xSystematic = LSS->applyPositionSystematics(xPos, 1, 1);
                     ySystematic = LSS->applyPositionSystematics(yPos, 1, 2);
                     zSystematic = LSS->applyPositionSystematics(zPos, 1, 3);
-                    energySmearingFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.172)",
+                    energySmearingFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.196)",
                                                  lowEnergyDelta - 10, lowEnergyDelta + 10);
                     break;
                 case -1:
                     xSystematic = LSS->applyPositionSystematics(xPos, -1, 1);
                     ySystematic = LSS->applyPositionSystematics(yPos, -1, 2);
                     zSystematic = LSS->applyPositionSystematics(zPos, -1, 3);
-                    energySmearingFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.136)",
+                    energySmearingFunc = new TF1("X", "TMath::Gaus(x, 0.0, 0.085)",
                                                  lowEnergyDelta - 10, lowEnergyDelta + 10);
                     break;
             }
@@ -311,14 +315,18 @@ void RingFitterEvent::Loop(int USEWATER, int dir)
             double systematicEnergy = LSS->applySmearing(followerFTK, energySmearingFunc);
             double nominalEnergy = LSS->applySmearing(followerFTK, nominalEnergyFunc);
 
-            double r3Systematic = sqrt((systematicDistance))/(600 * 10);
-            double r3Nom = sqrt((normalSquareDistance))/(600 * 10);
+            // The MC energy correction should not be applied to data.
+            if (!data) {
 
-            double cr3Systematic = 1.01159 - 0.0389943 * r3Systematic + 0.0250065 * pow(r3Systematic, 2);
-            double cr3Nom = 1.01159 - 0.0389943 * r3Nom + 0.0250065 * pow(r3Nom, 2);
+                double r3Systematic = sqrt((systematicDistance))/(600 * 10);
+                double r3Nom = sqrt((normalSquareDistance))/(600 * 10);
 
-            systematicEnergy = LSS->correctFollowerEnergy(systematicEnergy, cr3Systematic);
-            nominalEnergy = LSS->correctFollowerEnergy(nominalEnergy, cr3Nom);
+                double cr3Systematic = 1.01159 - 0.0389943 * r3Systematic + 0.0250065 * pow(r3Systematic, 2);
+                double cr3Nom = 1.01159 - 0.0389943 * r3Nom + 0.0250065 * pow(r3Nom, 2);
+
+                systematicEnergy = LSS->correctFollowerEnergy(systematicEnergy, cr3Systematic);
+                nominalEnergy = LSS->correctFollowerEnergy(nominalEnergy, cr3Nom);
+            }
 
             double wPlus = LSS->getwPlus(nominalEnergy);
             double wMinus = LSS->getwMinus(nominalEnergy);

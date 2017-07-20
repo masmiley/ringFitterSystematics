@@ -1,14 +1,13 @@
 # ringFitterSystematics
-Atmospheric Systematic Propagation for the SNO experiment. Applies High Low Energy Systematics to MC Data.
+Atmospheric Systematic Propagation for the SNO experiment. Applies High and Low Energy Systematics for D2O phase.
 
 ## Use
 In a ROOT Session:
-- `.L Systematic.cpp`
-- `.L LowScaleSystematics.cpp`
-- `.L HighScaleSystematics.cpp`
-- `.L HistogramMaker.cpp`
-- `.L HistogramMerger.cpp`
-- `.x loop.cc`
+```c++
+$ .x runAll.cc(dataFilename, mcFilename)
+```
+dataFilename: a string with the name of the file that has the data events.
+mcFilename: a string with the name of the file that has the MC events.
 
 ### Systematic Flag Selection
 There is flexibility available in choosing systematics. Most systematic flags are found in `LowScaleSystematics.h`. Due
@@ -17,7 +16,7 @@ class constructor. The Edep. Fid. Volume flag and the High Energy systematic fla
 a flag to true will apply the systematic, and false will omit it.
 
 ## Output
-- `Systematics.root`: Contains all final plots with upper and lower systematic application where needed.
-- `MC_CombinedSystematicNominal.root`: Contains just the nominal plots.
-- `MC_CombinedSystematicUpper.root`: Contains just the upper plots.
-- `MC_CombinedSystematicLower.root`: Contains just the lower plots.
+- `Systematics.root`: Contains all plots with upper and lower systematic application where needed for MC.
+- `SystematicsData.root`: Contains all plots with upper and lower systematic application where needed for Data.
+- `FinalPlots.root`: Contains the final plots with Data superimposed on MC. 
+
