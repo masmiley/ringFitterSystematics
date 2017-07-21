@@ -80,7 +80,7 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
             rFitEv->followers_deltat[ifol] >= 250e-3 ||
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
             ftkDist > 6000.0 ||
-            rFitEv->followers_energy[ifol][0] <= 4.0 ||
+            rFitEv->followers_energy[ifol][2] <= 4.0 ||
             rFitEv->followers_ftkitr[ifol] <= 0.5 ||
             !(rFitEv->followers_fit[0]));
 }
@@ -187,19 +187,6 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         histograms->hfitposdiff[1]->Fill(fpos_fY - cpos4_fY);
         histograms->hfitposdiff[2]->Fill(fpos_fZ - cpos4_fZ);
 
-        histograms->hseedpos[0]->Fill(spos_fX);
-        histograms->hseedpos[1]->Fill(spos_fY);
-        histograms->hseedpos[2]->Fill(spos_fZ);
-        histograms->hseedposdiff[0]->Fill(spos_fX - wpos_fX);
-        histograms->hseedposdiff[1]->Fill(spos_fY - wpos_fY);
-        histograms->hseedposdiff[2]->Fill(spos_fZ - wpos_fZ);
-        histograms->hfitpos[0]->Fill(fpos_fX);
-        histograms->hfitpos[1]->Fill(fpos_fY);
-        histograms->hfitpos[2]->Fill(fpos_fZ);
-        histograms->hfitposdiff[0]->Fill(fpos_fX - cpos4_fX);
-        histograms->hfitposdiff[1]->Fill(fpos_fY - cpos4_fY);
-        histograms->hfitposdiff[2]->Fill(fpos_fZ - cpos4_fZ);
-
         // Prompt Cuts
         if(fit[seed] == false) continue;
         if(double(intime[seed]) / double(nhit) <= 0.3) continue;
@@ -262,19 +249,19 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
             // Neutron Cuts
             if (neutronCut(ifol, this)) continue;
 
-            histograms->hfollowers_nhits->Fill(followers_nhit[ifol]);
-            histograms->hfollowers_deltat->Fill(followers_deltat[ifol]);
-            histograms->hfollowers_energy0->Fill(followers_energy[ifol][0]);
-            histograms->hfollowers_energy1->Fill(followers_energy[ifol][1]);
-            histograms->hfollowers_energy2->Fill(followers_energy[ifol][2]);
-            histograms->hfollowers_dist->Fill(sqrt(norm((followers_ftkpos_fX[ifol] - wpos_fX),
-                                                   (followers_ftkpos_fY[ifol] - wpos_fY),
-                                                   (followers_ftkpos_fZ[ifol] - wpos_fZ))));
-
             double xPos = followers_ftkpos_fX[ifol];
             double yPos = followers_ftkpos_fY[ifol];
             double zPos = followers_ftkpos_fZ[ifol];
             double followerFTK = followers_energy[ifol][2];
+
+            histograms->hfollowers_nhits->Fill(followers_nhit[ifol]);
+            histograms->hfollowers_deltat->Fill(followers_deltat[ifol]);
+            histograms->hfollowers_energy0->Fill(followers_energy[ifol][0]);
+            histograms->hfollowers_energy1->Fill(followers_energy[ifol][1]);
+            histograms->hfollowers_energy2->Fill(followerFTK);
+            histograms->hfollowers_dist->Fill(sqrt(norm((xPos - wpos_fX),
+                                                   (yPos - wpos_fY),
+                                                   (zPos - wpos_fZ))));
 
 
             LowScaleSystematics* LSS = new LowScaleSystematics(lowEnergyShift, lowEnergyDelta, sysUpXYZ, sysDownXYZ,
