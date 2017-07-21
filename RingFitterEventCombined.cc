@@ -75,9 +75,7 @@ bool micheleCut(int ifol, RingFitterEvent* rFitEv)
  *  @return true if the conditions of the Neutron cut are met.*/
 bool neutronCut(int ifol, RingFitterEvent* rFitEv)
 {
-    double ftkDist = sqrt(rFitEv->followers_ftkpos_fX[ifol] * rFitEv->followers_ftkpos_fX[ifol] +
-                          rFitEv->followers_ftkpos_fY[ifol] * rFitEv->followers_ftkpos_fY[ifol] +
-                          rFitEv->followers_ftkpos_fZ[ifol] * rFitEv->followers_ftkpos_fZ[ifol]);
+    double ftkDist = sqrt(norm(rFitEv->followers_ftkpos_fX[ifol], rFitEv->followers_ftkpos_fY[ifol], rFitEv->followers_ftkpos_fZ[ifol]));
     return (rFitEv->followers_deltat[ifol] <= 20e-6  ||
             rFitEv->followers_deltat[ifol] >= 250e-3 ||
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
@@ -151,8 +149,8 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
             fpos_fX = cpos4_fX;
             fpos_fY = cpos4_fY;
             fpos_fZ = cpos4_fZ;
-            effen_e = effenergy[0]; //cenergy[0]; //effenergy[0];
-            effen_m = effenergy[1]; //cenergy[1]; //effenergy[1];
+            effen_e = effenergy[0];
+            effen_m = effenergy[1];
         }
         else{
             seed = 1;
@@ -167,8 +165,8 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
             fpos_fX = cpos5_fX;
             fpos_fY = cpos5_fY;
             fpos_fZ = cpos5_fZ;
-            effen_e = effenergy[2]; //cenergy[2]; //effenergy[2];
-            effen_m = effenergy[3]; //cenergy[3]; //effenergy[3];
+            effen_e = effenergy[2];
+            effen_m = effenergy[3];
         }
 
         //Seed tests
@@ -203,9 +201,9 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         if(double(intime[seed])/double(nhit) <= 0.3) continue;
         if(neck != 0) continue;
         if(owl >= 3) continue;
-        if(sqrt(spos_fX*spos_fX + spos_fY*spos_fY + spos_fZ*spos_fZ) >= 8500.) continue;
-        if(sqrt(fpos_fX*fpos_fX + fpos_fY*fpos_fY + fpos_fZ*fpos_fZ) <= 0 ||
-           sqrt(fpos_fX*fpos_fX + fpos_fY*fpos_fY + fpos_fZ*fpos_fZ) >= 5500) continue;
+        if(sqrt(norm(spos_fX, spos_fY, spos_fZ)) >= 8500.) continue;
+        if(sqrt(norm(fpos_fX, fpos_fY, fpos_fZ)) <= 0 ||
+           sqrt(norm(fpos_fX, fpos_fY, fpos_fZ)) >= 5500) continue;
         if((datacleaning & 0xB62CC103000000) != 0) continue;
         if((trigtype & 0x7) == 0x0) continue;
 
@@ -263,9 +261,9 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
             histograms->hfollowers_energy0->Fill(followers_energy[ifol][0]);
             histograms->hfollowers_energy1->Fill(followers_energy[ifol][1]);
             histograms->hfollowers_energy2->Fill(followers_energy[ifol][2]);
-            histograms->hfollowers_dist->Fill(sqrt(pow((followers_ftkpos_fX[ifol] - wpos_fX),2) +
-                                                   pow((followers_ftkpos_fY[ifol] - wpos_fY),2) +
-                                                   pow((followers_ftkpos_fZ[ifol] - wpos_fZ),2)));
+            histograms->hfollowers_dist->Fill(sqrt(norm((followers_ftkpos_fX[ifol] - wpos_fX),
+                                                   (followers_ftkpos_fY[ifol] - wpos_fY),
+                                                   (followers_ftkpos_fZ[ifol] - wpos_fZ))));
 
             double xPos = followers_ftkpos_fX[ifol];
             double yPos = followers_ftkpos_fY[ifol];
