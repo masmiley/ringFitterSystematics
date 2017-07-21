@@ -39,7 +39,7 @@ const bool edepFidVol = true;
 // High Energy Flag
 const bool highEnergy = true;
 // High Energy Shift
-const double highEnergyShift = TMath::Abs(37.23 - 38.75)/37.23;
+const double highEnergyShift = TMath::Abs(37.23 - 38.75) / 37.23;
 
 // TODO Other systematic flags are in LowScaleSystematics.h/.cpp. These two should go there also.
 
@@ -116,7 +116,6 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
     if (fChain == 0) return;
 
     Long64_t nentries = fChain->GetEntriesFast();
-    std::cout << "Entries: " << std::endl;
 
     int nfol_tot = 0;
     Long64_t nbytes = 0;
@@ -129,6 +128,11 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         if (ientry < 0) break;
         nb = fChain->GetEntry(jentry);
         nbytes += nb;
+
+        // Simple tracker to monitor progress.
+        if (jentry % 100 == 0 && jentry > 0) {
+            std::cout << "Entry " << jentry << " complete" << std::endl;
+        }
 
         int seed;
         double spos_fX;
@@ -198,7 +202,7 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
 
         // Prompt Cuts
         if(fit[seed] == false) continue;
-        if(double(intime[seed])/double(nhit) <= 0.3) continue;
+        if(double(intime[seed]) / double(nhit) <= 0.3) continue;
         if(neck != 0) continue;
         if(owl >= 3) continue;
         if(sqrt(norm(spos_fX, spos_fY, spos_fZ)) >= 8500.) continue;
@@ -228,13 +232,15 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
 
         histograms->hprompt_nhits->Fill(nhit);
         histograms->hprompt_nrings->Fill(nrings[seed]);
-        if (nrings[seed] == 1) histograms->hprompt_pid->Fill(pid[seed]);
         if (nrings[seed] == 1){
-            if(pid[seed]==0)
-                histograms->hprompt_eeffenergy->Fill(shiftPromptEnergy);
-            else if(nrings[seed] == 1 && pid[seed]==1)
-                histograms->hprompt_ueffenergy->Fill(effen_m);
-        } else if(nrings[seed] == 2){
+          //Only fill PID where meaningful (i.e. one ring)
+          histograms->hprompt_pid->Fill(pid[seed]);
+
+          if (pid[seed] == 0)
+             histograms->hprompt_eeffenergy->Fill(shiftPromptEnergy);
+          else if (pid[seed] == 1)
+             histograms->hprompt_ueffenergy->Fill(effen_m); //why is this not shifted?
+        } else if (nrings[seed] == 2){
             histograms->hprompt_meffenergy->Fill(shiftPromptEnergy);
         }
 
@@ -364,12 +370,12 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         histograms->nfollowersmean_eeffenergy->Fill(shiftPromptEnergy, nFolSystematic);
         histograms->nfollowersmean_eeffenergy_norm->Fill(shiftPromptEnergy);
 
-        if (nrings[seed]==1){
+        if (nrings[seed] == 1){
             histograms->nfollowers_sring->Fill(nfol);
             histograms->nfollowers_sr_eeffenergy->Fill(shiftPromptEnergy, nfol);
             histograms->nfollowersmean_sr_eeffenergy->Fill(shiftPromptEnergy, nFolSystematic);
             histograms->nfollowersmean_sr_eeffenergy_norm->Fill(shiftPromptEnergy);
-        } else if (nrings[seed]==2){
+        } else if (nrings[seed] == 2){
             histograms->nfollowers_mring->Fill(nfol);
             histograms->nfollowers_mr_eeffenergy->Fill(shiftPromptEnergy,nfol);
             histograms->nfollowersmean_mr_eeffenergy->Fill(shiftPromptEnergy,nFolSystematic);
@@ -377,17 +383,13 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         }
         if(nfol == 0) {
             histograms->nhit_nofollow_tot->Fill(nhit);
-            if(nrings[seed]==1){
+            if(nrings[seed] == 1){
                 histograms->nhit_nofollow_sring->Fill(nhit);
-            } else if(nrings[seed]==2){
+            } else if(nrings[seed] == 2){
                 histograms->nhit_nofollow_mring->Fill(nhit);
             }
         }
 
-        // Simple tracker to monitor progress.
-        if (jentry % 100 == 0 && jentry > 0) {
-            std::cout << "Entry " << jentry << " complete" << std::endl;
-        }
     }
 
     histograms->writeAllToFile(outf);
