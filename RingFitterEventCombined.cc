@@ -39,7 +39,7 @@ const bool edepFidVol = true;
 // High Energy Flag
 const bool highEnergy = true;
 // High Energy Shift
-const double highEnergyShift = TMath::Abs(37.23 - 38.75)/37.23;
+const double highEnergyShift = TMath::Abs(37.23 - 38.75) / 37.23;
 
 // TODO Other systematic flags are in LowScaleSystematics.h/.cpp. These two should go there also.
 
@@ -80,7 +80,7 @@ bool neutronCut(int ifol, RingFitterEvent* rFitEv)
             rFitEv->followers_deltat[ifol] >= 250e-3 ||
             (rFitEv->followers_datacleaning2[ifol] & 0xB56DE1) != 0x0 ||
             ftkDist > 6000.0 ||
-            rFitEv->followers_energy[ifol][0] <= 4.0 ||
+            rFitEv->followers_energy[ifol][2] <= 4.0 ||
             rFitEv->followers_ftkitr[ifol] <= 0.5 ||
             !(rFitEv->followers_fit[0]));
 }
@@ -116,7 +116,6 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
     if (fChain == 0) return;
 
     Long64_t nentries = fChain->GetEntriesFast();
-    std::cout << "Entries: " << std::endl;
 
     int nfol_tot = 0;
     Long64_t nbytes = 0;
@@ -129,6 +128,11 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         if (ientry < 0) break;
         nb = fChain->GetEntry(jentry);
         nbytes += nb;
+
+        // Simple tracker to monitor progress.
+        if (jentry % 100 == 0 && jentry > 0) {
+            std::cout << "Entry " << jentry << " complete" << std::endl;
+        }
 
         int seed;
         double spos_fX;
@@ -183,22 +187,9 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         histograms->hfitposdiff[1]->Fill(fpos_fY - cpos4_fY);
         histograms->hfitposdiff[2]->Fill(fpos_fZ - cpos4_fZ);
 
-        histograms->hseedpos[0]->Fill(spos_fX);
-        histograms->hseedpos[1]->Fill(spos_fY);
-        histograms->hseedpos[2]->Fill(spos_fZ);
-        histograms->hseedposdiff[0]->Fill(spos_fX - wpos_fX);
-        histograms->hseedposdiff[1]->Fill(spos_fY - wpos_fY);
-        histograms->hseedposdiff[2]->Fill(spos_fZ - wpos_fZ);
-        histograms->hfitpos[0]->Fill(fpos_fX);
-        histograms->hfitpos[1]->Fill(fpos_fY);
-        histograms->hfitpos[2]->Fill(fpos_fZ);
-        histograms->hfitposdiff[0]->Fill(fpos_fX - cpos4_fX);
-        histograms->hfitposdiff[1]->Fill(fpos_fY - cpos4_fY);
-        histograms->hfitposdiff[2]->Fill(fpos_fZ - cpos4_fZ);
-
         // Prompt Cuts
         if(fit[seed] == false) continue;
-        if(double(intime[seed])/double(nhit) <= 0.3) continue;
+        if(double(intime[seed]) / double(nhit) <= 0.3) continue;
         if(neck != 0) continue;
         if(owl >= 3) continue;
         if(sqrt(norm(spos_fX, spos_fY, spos_fZ)) >= 8500.) continue;
@@ -228,13 +219,15 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
 
         histograms->hprompt_nhits->Fill(nhit);
         histograms->hprompt_nrings->Fill(nrings[seed]);
-        if (nrings[seed] == 1) histograms->hprompt_pid->Fill(pid[seed]);
         if (nrings[seed] == 1){
-            if(pid[seed]==0)
-                histograms->hprompt_eeffenergy->Fill(shiftPromptEnergy);
-            else if(nrings[seed] == 1 && pid[seed]==1)
-                histograms->hprompt_ueffenergy->Fill(effen_m);
-        } else if(nrings[seed] == 2){
+          //Only fill PID where meaningful (i.e. one ring)
+          histograms->hprompt_pid->Fill(pid[seed]);
+
+          if (pid[seed] == 0)
+             histograms->hprompt_eeffenergy->Fill(shiftPromptEnergy);
+          else if (pid[seed] == 1)
+             histograms->hprompt_ueffenergy->Fill(effen_m); //why is this not shifted?
+        } else if (nrings[seed] == 2){
             histograms->hprompt_meffenergy->Fill(shiftPromptEnergy);
         }
 
@@ -256,19 +249,19 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
             // Neutron Cuts
             if (neutronCut(ifol, this)) continue;
 
-            histograms->hfollowers_nhits->Fill(followers_nhit[ifol]);
-            histograms->hfollowers_deltat->Fill(followers_deltat[ifol]);
-            histograms->hfollowers_energy0->Fill(followers_energy[ifol][0]);
-            histograms->hfollowers_energy1->Fill(followers_energy[ifol][1]);
-            histograms->hfollowers_energy2->Fill(followers_energy[ifol][2]);
-            histograms->hfollowers_dist->Fill(sqrt(norm((followers_ftkpos_fX[ifol] - wpos_fX),
-                                                   (followers_ftkpos_fY[ifol] - wpos_fY),
-                                                   (followers_ftkpos_fZ[ifol] - wpos_fZ))));
-
             double xPos = followers_ftkpos_fX[ifol];
             double yPos = followers_ftkpos_fY[ifol];
             double zPos = followers_ftkpos_fZ[ifol];
             double followerFTK = followers_energy[ifol][2];
+
+            histograms->hfollowers_nhits->Fill(followers_nhit[ifol]);
+            histograms->hfollowers_deltat->Fill(followers_deltat[ifol]);
+            histograms->hfollowers_energy0->Fill(followers_energy[ifol][0]);
+            histograms->hfollowers_energy1->Fill(followers_energy[ifol][1]);
+            histograms->hfollowers_energy2->Fill(followerFTK);
+            histograms->hfollowers_dist->Fill(sqrt(norm((xPos - wpos_fX),
+                                                   (yPos - wpos_fY),
+                                                   (zPos - wpos_fZ))));
 
 
             LowScaleSystematics* LSS = new LowScaleSystematics(lowEnergyShift, lowEnergyDelta, sysUpXYZ, sysDownXYZ,
@@ -364,12 +357,12 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         histograms->nfollowersmean_eeffenergy->Fill(shiftPromptEnergy, nFolSystematic);
         histograms->nfollowersmean_eeffenergy_norm->Fill(shiftPromptEnergy);
 
-        if (nrings[seed]==1){
+        if (nrings[seed] == 1){
             histograms->nfollowers_sring->Fill(nfol);
             histograms->nfollowers_sr_eeffenergy->Fill(shiftPromptEnergy, nfol);
             histograms->nfollowersmean_sr_eeffenergy->Fill(shiftPromptEnergy, nFolSystematic);
             histograms->nfollowersmean_sr_eeffenergy_norm->Fill(shiftPromptEnergy);
-        } else if (nrings[seed]==2){
+        } else if (nrings[seed] == 2){
             histograms->nfollowers_mring->Fill(nfol);
             histograms->nfollowers_mr_eeffenergy->Fill(shiftPromptEnergy,nfol);
             histograms->nfollowersmean_mr_eeffenergy->Fill(shiftPromptEnergy,nFolSystematic);
@@ -377,17 +370,13 @@ void RingFitterEvent::Loop(int USEWATER, int dir, bool data)
         }
         if(nfol == 0) {
             histograms->nhit_nofollow_tot->Fill(nhit);
-            if(nrings[seed]==1){
+            if(nrings[seed] == 1){
                 histograms->nhit_nofollow_sring->Fill(nhit);
-            } else if(nrings[seed]==2){
+            } else if(nrings[seed] == 2){
                 histograms->nhit_nofollow_mring->Fill(nhit);
             }
         }
 
-        // Simple tracker to monitor progress.
-        if (jentry % 100 == 0 && jentry > 0) {
-            std::cout << "Entry " << jentry << " complete" << std::endl;
-        }
     }
 
     histograms->writeAllToFile(outf);

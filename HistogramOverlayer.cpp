@@ -35,20 +35,21 @@ void logCheck(TCanvas* canv, TH1* histData, TH1* histMC) {
 }
 
 void setDrawStyles(TCanvas* canv, TH1F* histData, TH1F* histMC) {
-    std::string styleMC;
+    std::string styleMC = "hist";
     std::string styleData = "e1";
     histMC->SetMarkerColor(kRed);
     histMC->SetLineColor(kRed);
+    bool effen = (string(histData->GetName())).find("effenergy") != std::string::npos;
+    bool mean = (string(histData->GetName())).find("nfollowers") != std::string::npos;
 
-    if ((string(histData->GetName())).find("nfollowers") != std::string::npos && (string(histData->GetName())).find("eeffenergy") != std::string::npos) {
+    if (effen) {
       histMC->SetFillColor(kRed);
       histMC->SetFillStyle(3001);
       styleMC = "e2";
     }
-    else {
+    if (!mean || !effen) {
       histData->Scale(1./histData->Integral(), "width");
       histMC->Scale(1./histMC->Integral(), "width");
-      styleMC = "hist";
     }
 
     if (histMC->GetMaximum() >= histData->GetMaximum()) {
@@ -157,4 +158,6 @@ void HistogramOverlayer::makeHistograms()
     }
 
     _outFile->Close();
+    histsData->removeAll();
+    histsMC->removeAll();
 }

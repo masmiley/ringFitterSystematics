@@ -58,6 +58,7 @@ public:
     HistogramMaker(TFile* file);
     void writeAllToFile(TFile* file);
     void writeAllToFileVec(TFile* file);
+    void removeAll();
 private:
     void binLogX(TH1* h, bool logLimits);
     void binLogX(TH2* h, bool logLimits);
