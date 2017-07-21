@@ -72,7 +72,7 @@ void boxMover(TCanvas* canv, TH1F* hist1, TH1F* hist2, std::string style1, std::
         hist2->Draw((style2 +string("sames")).c_str());
         canv->Modified();
         canv->Update();
-        st2 = (TPaveStats*) c1->GetPrimitive("stats");
+        st2 = (TPaveStats*) canv->GetPrimitive("stats");
         st2->SetName((string(st2->GetName())+string(hist2->GetName())).c_str());
 
         Double_t newY2 = st1->GetY1NDC();
@@ -86,6 +86,7 @@ void boxMover(TCanvas* canv, TH1F* hist1, TH1F* hist2, std::string style1, std::
         canv->Modified();
         canv->Update();
 }
+
 void HistogramOverlayer::printCanvas(TCanvas* canv, int index, int maxsize, bool first, bool oftwo) {
     _outFile->WriteTObject(canv);
     if (index == 0) {
@@ -119,77 +120,16 @@ void HistogramOverlayer::makeHistograms()
       if (histsData->hists.at(i)->IsA() == TH1F::Class() && histsMC->hists.at(i)->IsA() == TH1F::Class()) {
         TH1F* hData = (TH1F*) histsData->hists.at(i);
         TH1F* hMC = (TH1F*) histsMC->hists.at(i);
-        hMC->SetMarkerColor(2);
-        hMC->SetLineColor(2);
         hMC->Sumw2();
         hData->Sumw2();
 
         logCheck(c1, hData, hMC);
-        if ((string(hData->GetName())).find("nfollowers") == std::string::npos && (string(hData->GetName())).find("eeffenergy") == std::string::npos) {
-          hData->Scale(1./hData->Integral(), "width");
-          hMC->Scale(1./hMC->Integral(), "width");
-        }
-
         c1->SetName(hData->GetName());
         renameHist(hData, "Data");
         renameHist(hMC, "MC");
 
-        TPaveStats *st1;
-        TPaveStats *st2; 
-
-        if (hMC->GetMaximum() >= hData->GetMaximum()) {
-          c1->cd();
-          if ((string(hData->GetName())).find("nfollowers") != std::string::npos && (string(hData->GetName())).find("eeffenergy") != std::string::npos) {
-            hMC->SetMarkerColor(2);
-            hMC->SetLineColor(2);
-            hMC->SetFillColor(kRed);
-            hMC->SetFillStyle(3001);
-            hMC->Draw("e2");
-          }
-          else {
-            hMC->Draw("hist");
-          }
-          c1->Modified();
-          c1->Update();
-          st1 = (TPaveStats*) c1->GetPrimitive("stats");
-          st1->SetName((string(st1->GetName())+string(hMC->GetName())).c_str());
-          hData->Draw("e1sames");
-          c1->Modified();
-          c1->Update();
-          st2 = (TPaveStats*) c1->GetPrimitive("stats");
-          st2->SetName((string(st2->GetName())+string(hData->GetName())).c_str());
-        }
-        else {
-          c1->cd();
-          std::string mcstyle;
-          if ((string(hData->GetName())).find("nfollowers") != std::string::npos && (string(hData->GetName())).find("eeffenergy") != std::string::npos) {
-            hMC->SetFillStyle(3001);
-            mcstyle = "e2sames";
-          }
-          else {
-            mcstyle = "histsames";
-          }
-          hData->Draw("e1");
-          c1->Modified();
-          c1->Update();
-          st2 = (TPaveStats*) c1->GetPrimitive("stats");
-          st2->SetName((string(st2->GetName())+string(hData->GetName())).c_str());
-          hMC->Draw(mcstyle.c_str());
-          c1->Modified();
-          c1->Update();
-          st1 = (TPaveStats*) c1->GetPrimitive("stats");
-          st1->SetName((string(st1->GetName())+string(hMC->GetName())).c_str());
-        }
-        Double_t newY2 = st1->GetY1NDC();
-        Double_t newY1 = newY2 - (st2->GetY2NDC() - st2->GetY1NDC());
-        st2->SetY1NDC(newY1);
-        st2->SetY2NDC(newY2);
-        c1->Modified();
-        c1->Update();
-
-        TLegend* leg = c1->BuildLegend(st2->GetX1NDC(), st2->GetY1NDC() - (st2->GetY2NDC() - st2->GetY1NDC()),st1->GetX2NDC(), st2->GetY1NDC());
-        c1->Modified();
-        c1->Update();
+        c1->cd();
+        setDrawStyles(c1, hData, hMC);
         this->printCanvas(c1, i, numHists, true, false);
       }
 
