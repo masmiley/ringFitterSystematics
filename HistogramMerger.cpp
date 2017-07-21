@@ -279,6 +279,8 @@ void HistogramMerger::makeHistograms()
 
     // Write histograms to output file for later use - i.e. superimposing data and MC
     histsNominal->writeAllToFileVec(_outFile);
+    histsUpper->removeAll();
+    histsLower->removeAll();
 
     _outFile->Close();
 

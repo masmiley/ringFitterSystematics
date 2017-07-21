@@ -97,6 +97,9 @@ HistogramMaker::HistogramMaker(TFile* file)
     hists.push_back(hseedpos[0]);
     hists.push_back(hseedpos[1]);
     hists.push_back(hseedpos[2]);
+    hists.push_back(hseedposdiff[0]);
+    hists.push_back(hseedposdiff[1]);
+    hists.push_back(hseedposdiff[2]);
     hists.push_back(hfitpos[0]);
     hists.push_back(hfitpos[1]);
     hists.push_back(hfitpos[2]);
@@ -219,8 +222,18 @@ void HistogramMaker::writeAllToFileVec(TFile* file)
    for (unsigned i =0; i < hists.size(); i++) {
        file->WriteTObject(hists.at(i));
    }
+   this->removeAll();
 
 }
+
+void HistogramMaker::removeAll()
+{
+   for (unsigned i =0; i < hists.size(); i++) {
+       hists.at(i)->Delete();
+   }
+
+}
+
 /** Write all the histograms to the ROOT file
  *  @param file File to which histograms produced by
  *              this object are written to. */
@@ -267,6 +280,7 @@ void HistogramMaker::writeAllToFile(TFile* file)
     file->WriteTObject(nfollowers_mr_eeffenergy);
     file->WriteTObject(nfollowersmean_mr_eeffenergy);
     file->WriteTObject(nfollowersmean_mr_eeffenergy_norm);
+    this->removeAll();
 }
 
 /** Set the X Bins to a Logarithmic Scale on the TH1 Histogram h.

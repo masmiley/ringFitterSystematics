@@ -157,4 +157,6 @@ void HistogramOverlayer::makeHistograms()
     }
 
     _outFile->Close();
+    histsData->removeAll();
+    histsMC->removeAll();
 }

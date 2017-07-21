@@ -5,3 +5,4 @@
 .idea/inspectionProfiles/
 cmake-build-debug/
 *.root
+*.pdf
