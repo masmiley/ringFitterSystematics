@@ -2,6 +2,7 @@
 // Created by Jyotirmai Singh on 7/19/17.
 //
 #include <string>
+#include <HistogramOverlayer.cpp>
 TH1F* getHisto(std::string name, TFile* file)
 {
     return (TH1F*) file->Get(name.c_str());
@@ -39,6 +40,9 @@ void superimposeDataMC(std::string nameMC, std::string nameDATA)
     TFile* mcFile = new TFile(nameMC.c_str(), "open");
     TFile* dataFile = new TFile(nameDATA.c_str(), "open");
     TFile* combinedPlot = new TFile("FinalPlots.root", "recreate");
+    TFile* outF = new TFile("AllPlots.root", "recreate");
+    HistogramOverlayer* over = new HistogramOverlayer(dataFile, mcFile, outF);
+    over->makeHistograms();
 
     TCanvas* cprompts = new TCanvas("cprompts","Prompt Distributions", 1600, 800);
     cprompts->Divide(3, 1);

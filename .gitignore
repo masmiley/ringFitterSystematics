@@ -2,6 +2,7 @@
 *.txt
 *.C
 *.iml
+*.root
 .idea/inspectionProfiles/
 cmake-build-debug/
 *.root
