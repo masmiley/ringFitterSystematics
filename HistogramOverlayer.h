@@ -14,13 +14,14 @@
 class HistogramOverlayer {
     public:
         HistogramOverlayer(TFile* mcFile, TFile* dataFile, TFile* outFile);
-        HistogramOverlayer();
         void makeHistograms();
         TFile* _outFile;
 
     private:
         TFile* _mcFile;
         TFile* _dataFile;
+        std::string _pdfFilename;
+        void printCanvas(TCanvas* canv, int index, int maxsize, bool first, bool oftwo);
 };
 
 

@@ -8,13 +8,32 @@
 #include "HistogramOverlayer.h"
 #include "HistogramMaker.h"
 
-HistogramOverlayer::HistogramOverlayer() {}
-
 HistogramOverlayer::HistogramOverlayer(TFile* dataFile, TFile* mcFile, TFile* outFile)
 {
     _dataFile = dataFile;
     _mcFile = mcFile;
     _outFile = outFile;
+
+    std::string outfilename = std::string(_outFile->GetName());
+    size_t index = outfilename.find(".");
+    _pdfFilename = outfilename.substr(0, index) + ".pdf";
+
+}
+
+void HistogramOverlayer::printCanvas(TCanvas* canv, int index, int maxsize, bool first, bool oftwo) {
+    _outFile->WriteTObject(canv);
+    if (index == 0) {
+      if (first) canv->Print((_pdfFilename+string("(")).c_str(), "pdf");
+      else canv->Print(_pdfFilename.c_str(), "pdf");
+    }
+    else if (index == maxsize - 1) {
+      if (first && oftwo) canv->Print(_pdfFilename.c_str(), "pdf");
+      else canv->Print((_pdfFilename+string(")")).c_str(), "pdf");
+    }
+    else {
+        canv->Print(_pdfFilename.c_str(), "pdf");
+    }
+    canv->Clear();
 }
 
 /** Main method, makes all histograms and draws them on
@@ -24,10 +43,6 @@ void HistogramOverlayer::makeHistograms()
     HistogramMaker* histsData = new HistogramMaker(_dataFile);
     HistogramMaker* histsMC = new HistogramMaker(_mcFile);
 
-    std::string outfilename = std::string(_outFile->GetName());
-    size_t index = outfilename.find(".");
-    std::string pdffilename;
-    pdffilename = outfilename.substr(0, index) + ".pdf";
     TCanvas* c1 = new TCanvas();
     TCanvas* c2 = new TCanvas();
 
@@ -108,17 +123,7 @@ void HistogramOverlayer::makeHistograms()
         TLegend* leg = c1->BuildLegend(st2->GetX1NDC(), st2->GetY1NDC() - (st2->GetY2NDC() - st2->GetY1NDC()),st1->GetX2NDC(), st2->GetY1NDC());
         c1->Modified();
         c1->Update();
-        _outFile->WriteTObject(c1);
-        if (i == 0) {
-          c1->Print((pdffilename+string("(")).c_str(), "pdf");
-        }
-        else if (i == histsMC->hists.size() - 1) {
-          c1->Print((pdffilename+string(")")).c_str(), "pdf");
-        }
-        else {
-          c1->Print(pdffilename.c_str(), "pdf");
-        }
-        c1->Clear();
+        this->printCanvas(c1, i, histsMC->hists.size(), true, false);
       }
       else if (histsData->hists.at(i)->IsA() == TH2F::Class() && histsMC->hists.at(i)->IsA() == TH2F::Class()) {
         TH2F* h2Data = (TH2F*) histsData->hists.at(i);
@@ -141,26 +146,14 @@ void HistogramOverlayer::makeHistograms()
         h2Data->Draw("colz");
         c2->cd();
         h2MC->Draw("colz");
-        if (i == 0) {
-          c1->Print((pdffilename+string("(")).c_str(), "pdf");
-          c2->Print(pdffilename.c_str(), "pdf");
-        }
-        else if (i == histsMC->hists.size() - 1) {
-          c1->Print(pdffilename.c_str(), "pdf");
-          c2->Print((pdffilename+string(")")).c_str(), "pdf");
-        }
-        else {
-          c1->Print(pdffilename.c_str(), "pdf");
-          c2->Print(pdffilename.c_str(), "pdf");
-        }
-        c1->Clear();
-        c2->Clear();
+        this->printCanvas(c1, i, histsMC->hists.size(), true, true);
+        this->printCanvas(c2, i, histsMC->hists.size(), false, true);
       }
       else if (i == histsMC->hists.size() - 1) {
-         c1->Print((pdffilename+string("]")).c_str(), "pdf");
+         c1->Print((_pdfFilename+string("]")).c_str(), "pdf");
     
       }
     }
-    //_outFile->Close();
+    _outFile->Close();
 
 }

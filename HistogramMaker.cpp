@@ -31,65 +31,68 @@ TH2F* HistogramMaker::get2DHisto(TH2F* hist, TFile* file)
 HistogramMaker::HistogramMaker(TFile* file)
 {
     gROOT->cd();
+
     HistogramInitializer();
 
     if (file != 0) {
-      hseedpos[0] = getHisto(hseedpos[0], file);
-      hseedpos[1] = getHisto(hseedpos[1], file);
-      hseedpos[2] = getHisto(hseedpos[2], file);
+      if (file->GetListOfKeys()->Last() != 0) {
+        hseedpos[0] = getHisto(hseedpos[0], file);
+        hseedpos[1] = getHisto(hseedpos[1], file);
+        hseedpos[2] = getHisto(hseedpos[2], file);
 
-      hseedposdiff[0] = getHisto(hseedposdiff[0], file);
-      hseedposdiff[1] = getHisto(hseedposdiff[1], file);
-      hseedposdiff[2] = getHisto(hseedposdiff[2], file);
+        hseedposdiff[0] = getHisto(hseedposdiff[0], file);
+        hseedposdiff[1] = getHisto(hseedposdiff[1], file);
+        hseedposdiff[2] = getHisto(hseedposdiff[2], file);
 
-      hfitpos[0] = getHisto(hfitpos[0], file);
-      hfitpos[1] = getHisto(hfitpos[1], file);
-      hfitpos[2] = getHisto(hfitpos[2], file);
+        hfitpos[0] = getHisto(hfitpos[0], file);
+        hfitpos[1] = getHisto(hfitpos[1], file);
+        hfitpos[2] = getHisto(hfitpos[2], file);
 
-      hfitposdiff[0] = getHisto(hfitposdiff[0], file);
-      hfitposdiff[1] = getHisto(hfitposdiff[1], file);
-      hfitposdiff[2] = getHisto(hfitposdiff[2], file);
+        hfitposdiff[0] = getHisto(hfitposdiff[0], file);
+        hfitposdiff[1] = getHisto(hfitposdiff[1], file);
+        hfitposdiff[2] = getHisto(hfitposdiff[2], file);
 
-      // Prompts
-      hprompt_nhits = getHisto(hprompt_nhits, file);
-      hprompt_nrings = getHisto(hprompt_nrings, file);
-      hprompt_pid = getHisto(hprompt_pid, file);
-      hprompt_eeffenergy = getHisto(hprompt_eeffenergy, file);
-      hprompt_ueffenergy = getHisto(hprompt_ueffenergy, file);
-      hprompt_meffenergy = getHisto(hprompt_meffenergy, file);
+        // Prompts
+        hprompt_nhits = getHisto(hprompt_nhits, file);
+        hprompt_nrings = getHisto(hprompt_nrings, file);
+        hprompt_pid = getHisto(hprompt_pid, file);
+        hprompt_eeffenergy = getHisto(hprompt_eeffenergy, file);
+        hprompt_ueffenergy = getHisto(hprompt_ueffenergy, file);
+        hprompt_meffenergy = getHisto(hprompt_meffenergy, file);
 
-      // Michel e
-      hmichele_nhits = getHisto(hmichele_nhits, file);
-      hmichele_deltat = getHisto(hmichele_deltat, file);
-      hmichele_energy0 = getHisto(hmichele_energy0, file);
-      hmichele_energy1 = getHisto(hmichele_energy1, file);
-      hmichele_energy2 = getHisto(hmichele_energy2, file);
+        // Michel e
+        hmichele_nhits = getHisto(hmichele_nhits, file);
+        hmichele_deltat = getHisto(hmichele_deltat, file);
+        hmichele_energy0 = getHisto(hmichele_energy0, file);
+        hmichele_energy1 = getHisto(hmichele_energy1, file);
+        hmichele_energy2 = getHisto(hmichele_energy2, file);
 
-      // Neutrons
-      hfollowers_nhits = getHisto(hfollowers_nhits, file);
-      hfollowers_deltat = getHisto(hfollowers_deltat, file);
-      hfollowers_energy0 = getHisto(hfollowers_energy0, file);
-      hfollowers_energy1 = getHisto(hfollowers_energy1, file);
-      hfollowers_energy2 = getHisto(hfollowers_energy2, file);
-      hfollowers_dist = getHisto(hfollowers_dist, file);
-      nfollowers_tot = getHisto(nfollowers_tot, file);
-      nfollowers_sring = getHisto(nfollowers_sring, file);
-      nfollowers_mring = getHisto(nfollowers_mring, file);
+        // Neutrons
+        hfollowers_nhits = getHisto(hfollowers_nhits, file);
+        hfollowers_deltat = getHisto(hfollowers_deltat, file);
+        hfollowers_energy0 = getHisto(hfollowers_energy0, file);
+        hfollowers_energy1 = getHisto(hfollowers_energy1, file);
+        hfollowers_energy2 = getHisto(hfollowers_energy2, file);
+        hfollowers_dist = getHisto(hfollowers_dist, file);
+        nfollowers_tot = getHisto(nfollowers_tot, file);
+        nfollowers_sring = getHisto(nfollowers_sring, file);
+        nfollowers_mring = getHisto(nfollowers_mring, file);
 
-      nhit_nofollow_tot = getHisto(nhit_nofollow_tot, file);
-      nhit_nofollow_sring = getHisto(nhit_nofollow_sring, file);
-      nhit_nofollow_mring = getHisto(nhit_nofollow_mring, file);
+        nhit_nofollow_tot = getHisto(nhit_nofollow_tot, file);
+        nhit_nofollow_sring = getHisto(nhit_nofollow_sring, file);
+        nhit_nofollow_mring = getHisto(nhit_nofollow_mring, file);
 
-      nfollowers_eeffenergy = get2DHisto(nfollowers_eeffenergy, file);
-      nfollowersmean_eeffenergy = getHisto(nfollowersmean_eeffenergy, file);
-      nfollowersmean_eeffenergy_norm = getHisto(nfollowersmean_eeffenergy_norm, file);
-      nfollowers_sr_eeffenergy = get2DHisto(nfollowers_sr_eeffenergy, file);
-      nfollowersmean_sr_eeffenergy = getHisto(nfollowersmean_sr_eeffenergy, file);
-      nfollowersmean_sr_eeffenergy_norm = getHisto(nfollowersmean_sr_eeffenergy_norm, file);
-      nfollowers_mr_eeffenergy = get2DHisto(nfollowers_mr_eeffenergy, file);
-      nfollowersmean_mr_eeffenergy = getHisto(nfollowersmean_mr_eeffenergy, file);
-      nfollowersmean_mr_eeffenergy_norm = getHisto(nfollowersmean_mr_eeffenergy_norm, file);
-    }
+        nfollowers_eeffenergy = get2DHisto(nfollowers_eeffenergy, file);
+        nfollowersmean_eeffenergy = getHisto(nfollowersmean_eeffenergy, file);
+        nfollowersmean_eeffenergy_norm = getHisto(nfollowersmean_eeffenergy_norm, file);
+        nfollowers_sr_eeffenergy = get2DHisto(nfollowers_sr_eeffenergy, file);
+        nfollowersmean_sr_eeffenergy = getHisto(nfollowersmean_sr_eeffenergy, file);
+        nfollowersmean_sr_eeffenergy_norm = getHisto(nfollowersmean_sr_eeffenergy_norm, file);
+        nfollowers_mr_eeffenergy = get2DHisto(nfollowers_mr_eeffenergy, file);
+        nfollowersmean_mr_eeffenergy = getHisto(nfollowersmean_mr_eeffenergy, file);
+        nfollowersmean_mr_eeffenergy_norm = getHisto(nfollowersmean_mr_eeffenergy_norm, file);
+      }
+   }
 
     hists.push_back(hseedpos[0]);
     hists.push_back(hseedpos[1]);
