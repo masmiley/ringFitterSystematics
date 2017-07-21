@@ -1,7 +1,7 @@
 /** @class HistogramMaker
  *  Manages histogram production, either from a source file
  *  or by itself.
- *  @author Jyotirmai Singh */
+ *  @authors Jyotirmai Singh, Max Smiley */
 
 #include <string>
 #include "HistogramMaker.h"

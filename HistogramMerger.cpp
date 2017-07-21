@@ -2,7 +2,7 @@
  *  Takes a nominal, lower, and upper file and
  *  merges the histograms as appropriate, changing errors
  *  where needed.
- *  @author Jyotirmai Singh */
+ *  @authors Jyotirmai Singh, Max Smiley */
 
 #include <cmath>
 #include "HistogramMerger.h"

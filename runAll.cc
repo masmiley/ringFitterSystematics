@@ -1,3 +1,7 @@
+/** Macro to run Atmospheric Systematics at Low and High scales. 
+ *  Runs for data and MC to produce final multiplicty plots. 
+ *  @authors Jyotirmai Singh, Max Smiley  */
+
 #include <string> 
 #include <iostream>
 #include <vector>
