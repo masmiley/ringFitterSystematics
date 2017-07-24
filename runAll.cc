@@ -22,6 +22,7 @@ void runAll(std::string dataName, std::string mcName) {
   std::string dataCommand = ".x loop.cc(true, \"" + dataName + "\")";
   std::cout << dataCommand << std::endl;
   gROOT->ProcessLine(dataCommand.c_str());
+  gRandom->SetSeed(42);
   std::string mcCommand = ".x loop.cc(false, \"" +  mcName + "\")";
   gROOT->ProcessLine(mcCommand.c_str());
   gROOT->ProcessLine(".x superimposeDataMC.cpp(\"Systematics.root\", \"SystematicsData.root\")");
