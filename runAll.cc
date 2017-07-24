@@ -11,6 +11,8 @@
 #endif
 void runAll(std::string dataName, std::string mcName) {
   gROOT->SetBatch(kTRUE);
+  gROOT->ProcessLine(".x sysStyle.C");
+  gROOT->SetStyle("sysStyle");
   gROOT->ProcessLine(".L Systematic.cpp");
   gROOT->ProcessLine(".L HighScaleSystematics.cpp");
   gROOT->ProcessLine(".L LowScaleSystematics.cpp");
