@@ -167,6 +167,23 @@ public :
    Int_t           mcid;
    Int_t           evi;
    Bool_t          mc;
+   Double_t        mctotalenergy;
+   UInt_t          genievertex_fUniqueID;
+   UInt_t          genievertex_fBits;
+   Double_t        genievertex_fX;
+   Double_t        genievertex_fY;
+   Double_t        genievertex_fZ;
+   string          scatteringtype;
+   string          interactiontype;
+   Int_t           neutrinoPDG;
+   Int_t           parentnucleonPDG;
+   Int_t           chargedleptonPDG;
+   Double_t        neutrinoenergy;
+   Double_t        chargedleptonenergy;
+   Int_t           pioncount;
+   Int_t           protoncount;
+   Int_t           neutroncount;
+   Int_t           othercount;
    Int_t           interaction;
    Int_t           nutype;
    Int_t           pneutrons;
@@ -198,6 +215,8 @@ public :
    Double_t        followers_wpos_fX[kMaxfollowers];   //[followers_]
    Double_t        followers_wpos_fY[kMaxfollowers];   //[followers_]
    Double_t        followers_wpos_fZ[kMaxfollowers];   //[followers_]
+   UInt_t          followers_ftkpos_fUniqueID[kMaxfollowers];   //[followers_]
+   UInt_t          followers_ftkpos_fBits[kMaxfollowers];   //[followers_]
    Double_t        followers_ftkpos_fX[kMaxfollowers]; //[followers_]
    Double_t        followers_ftkpos_fY[kMaxfollowers]; //[followers_]
    Double_t        followers_ftkpos_fZ[kMaxfollowers]; //[followers_]
@@ -324,6 +343,23 @@ public :
    Double_t        followers_gtrigtime[kMaxfollowers];   //[followers_]
    Int_t           followers_mcid[kMaxfollowers];   //[followers_]
    Int_t           followers_evi[kMaxfollowers];   //[followers_]
+   Double_t        followers_mctotalenergy[kMaxfollowers];   //[followers_];
+   UInt_t          followers_genievertex_fUniqueID[kMaxfollowers];   //[followers_]
+   UInt_t          followers_genievertex_fBits[kMaxfollowers];   //[followers_]
+   Double_t        followers_genievertex_fX[kMaxfollowers];   //[followers_]
+   Double_t        followers_genievertex_fY[kMaxfollowers];   //[followers_]
+   Double_t        followers_genievertex_fZ[kMaxfollowers];   //[followers_]
+   string          followers_scatteringtype[kMaxfollowers];   //[followers_]
+   string          followers_interactiontype[kMaxfollowers];   //[followers_]
+   Int_t           followers_neutrinoPDG[kMaxfollowers];   //[followers_]
+   Int_t           followers_parentnucleonPDG[kMaxfollowers];   //[followers_]
+   Int_t           followers_chargedleptonPDG[kMaxfollowers];   //[followers_]
+   Double_t        followers_neutrinoenergy[kMaxfollowers];   //[followers_]
+   Double_t        followers_chargedleptonenergy[kMaxfollowers];   //[followers_]
+   Int_t           followers_pioncount[kMaxfollowers];   //[followers_]
+   Int_t           followers_protoncount[kMaxfollowers];   //[followers_]
+   Int_t           followers_neutroncount[kMaxfollowers];   //[followers_]
+   Int_t           followers_othercount[kMaxfollowers];   //[followers_]
    Bool_t          followers_mc[kMaxfollowers];   //[followers_]
    Double_t        followers_deltat[kMaxfollowers];   //[followers_]
    vector<Double_t> reweight_up;
@@ -478,6 +514,23 @@ public :
    TBranch        *b_prompts_mcid;   //!
    TBranch        *b_prompts_evi;   //!
    TBranch        *b_prompts_mc;   //!
+   TBranch        *b_prompts_mctotalenergy;   //!
+   TBranch        *b_prompts_genievertex_fUniqueID;   //!
+   TBranch        *b_prompts_genievertex_fBits;   //!
+   TBranch        *b_prompts_genievertex_fX;   //!
+   TBranch        *b_prompts_genievertex_fY;   //!
+   TBranch        *b_prompts_genievertex_fZ;   //!
+   TBranch        *b_prompts_scatteringtype;   //!
+   TBranch        *b_prompts_interactiontype;   //!
+   TBranch        *b_prompts_neutrinoPDG;   //!
+   TBranch        *b_prompts_parentnucleonPDG;   //!
+   TBranch        *b_prompts_chargedleptonPDG;   //!
+   TBranch        *b_prompts_neutrinoenergy;   //!
+   TBranch        *b_prompts_chargedleptonenergy;   //!
+   TBranch        *b_prompts_pioncount;   //!
+   TBranch        *b_prompts_protoncount;   //!
+   TBranch        *b_prompts_neutroncount;   //!
+   TBranch        *b_prompts_othercount;   //!
    TBranch        *b_prompts_interaction;   //!
    TBranch        *b_prompts_nutype;   //!
    TBranch        *b_prompts_pneutrons;   //!
@@ -509,6 +562,8 @@ public :
    TBranch        *b_followers_wpos_fX;   //!
    TBranch        *b_followers_wpos_fY;   //!
    TBranch        *b_followers_wpos_fZ;   //!
+   TBranch        *b_followers_ftkpos_fUniqueID;   //!
+   TBranch        *b_followers_ftkpos_fBits;   //!
    TBranch        *b_followers_ftkpos_fX; //!
    TBranch        *b_followers_ftkpos_fY; //!
    TBranch        *b_followers_ftkpos_fZ; //!
@@ -635,6 +690,23 @@ public :
    TBranch        *b_followers_gtrigtime;   //!
    TBranch        *b_followers_mcid;   //!
    TBranch        *b_followers_evi;   //!
+   TBranch        *b_followers_mctotalenergy;   //!
+   TBranch        *b_followers_genievertex_fUniqueID;   //!
+   TBranch        *b_followers_genievertex_fBits;   //!
+   TBranch        *b_followers_genievertex_fX;   //!
+   TBranch        *b_followers_genievertex_fY;   //!
+   TBranch        *b_followers_genievertex_fZ;   //!
+   TBranch        *b_followers_scatteringtype;   //!
+   TBranch        *b_followers_interactiontype;   //!
+   TBranch        *b_followers_neutrinoPDG;   //!
+   TBranch        *b_followers_parentnucleonPDG;   //!
+   TBranch        *b_followers_chargedleptonPDG;   //!
+   TBranch        *b_followers_neutrinoenergy;   //!
+   TBranch        *b_followers_chargedleptonenergy;   //!
+   TBranch        *b_followers_pioncount;   //!
+   TBranch        *b_followers_protoncount;   //!
+   TBranch        *b_followers_neutroncount;   //!
+   TBranch        *b_followers_othercount;   //!
    TBranch        *b_followers_mc;   //!
    TBranch        *b_followers_deltat;   //!
    TBranch        *b_prompts_reweight_up;   //!
@@ -858,6 +930,23 @@ void RingFitterEvent::Init(TTree *tree)
    fChain->SetBranchAddress("mcid", &mcid, &b_prompts_mcid);
    fChain->SetBranchAddress("evi", &evi, &b_prompts_evi);
    fChain->SetBranchAddress("mc", &mc, &b_prompts_mc);
+   fChain->SetBranchAddress("mctotalenergy", &mctotalenergy, &b_prompts_mctotalenergy);
+   fChain->SetBranchAddress("genievertex_fUniqueID", &genievertex_fUniqueID, &b_prompts_genievertex_fUniqueID);
+   fChain->SetBranchAddress("genievertex_fBits", &genievertex_fBits, &b_prompts_genievertex_fBits);
+   fChain->SetBranchAddress("genievertex_fX", &genievertex_fX, &b_prompts_genievertex_fX);
+   fChain->SetBranchAddress("genievertex_fY", &genievertex_fY, &b_prompts_genievertex_fY);
+   fChain->SetBranchAddress("genievertex_fZ", &genievertex_fZ, &b_prompts_genievertex_fZ);
+   fChain->SetBranchAddress("scatteringtype", &scatteringtype, &b_prompts_scatteringtype);
+   fChain->SetBranchAddress("interactiontype", &interactiontype, &b_prompts_interactiontype);
+   fChain->SetBranchAddress("neutrinoPDG", &neutrinoPDG, &b_prompts_neutrinoPDG);
+   fChain->SetBranchAddress("parentnucleonPDG", &parentnucleonPDG, &b_prompts_parentnucleonPDG);
+   fChain->SetBranchAddress("chargedleptonPDG", &chargedleptonPDG, &b_prompts_chargedleptonPDG);
+   fChain->SetBranchAddress("neutrinoenergy", &neutrinoenergy, &b_prompts_neutrinoenergy);
+   fChain->SetBranchAddress("chargedleptonenergy", &chargedleptonenergy, &b_prompts_chargedleptonenergy);
+   fChain->SetBranchAddress("pioncount", &pioncount, &b_prompts_pioncount);
+   fChain->SetBranchAddress("protoncount", &protoncount, &b_prompts_protoncount);
+   fChain->SetBranchAddress("neutroncount", &neutroncount, &b_prompts_neutroncount);
+   fChain->SetBranchAddress("othercount", &othercount, &b_prompts_othercount);
    fChain->SetBranchAddress("interaction", &interaction, &b_prompts_interaction);
    fChain->SetBranchAddress("nutype", &nutype, &b_prompts_nutype);
    fChain->SetBranchAddress("pneutrons", &pneutrons, &b_prompts_pneutrons);
@@ -889,6 +978,8 @@ void RingFitterEvent::Init(TTree *tree)
    fChain->SetBranchAddress("followers.wpos.fX", followers_wpos_fX, &b_followers_wpos_fX);
    fChain->SetBranchAddress("followers.wpos.fY", followers_wpos_fY, &b_followers_wpos_fY);
    fChain->SetBranchAddress("followers.wpos.fZ", followers_wpos_fZ, &b_followers_wpos_fZ);
+   fChain->SetBranchAddress("followers.ftkpos.fUniqueID", followers_ftkpos_fUniqueID, &b_followers_ftkpos_fUniqueID);
+   fChain->SetBranchAddress("followers.ftkpos.fBits", followers_ftkpos_fBits, &b_followers_ftkpos_fBits);
    fChain->SetBranchAddress("followers.ftkpos.fX", followers_ftkpos_fX, &b_followers_ftkpos_fX);
    fChain->SetBranchAddress("followers.ftkpos.fY", followers_ftkpos_fY, &b_followers_ftkpos_fY);
    fChain->SetBranchAddress("followers.ftkpos.fZ", followers_ftkpos_fZ, &b_followers_ftkpos_fZ);
@@ -1016,6 +1107,23 @@ void RingFitterEvent::Init(TTree *tree)
    fChain->SetBranchAddress("followers.mcid", followers_mcid, &b_followers_mcid);
    fChain->SetBranchAddress("followers.evi", followers_evi, &b_followers_evi);
    fChain->SetBranchAddress("followers.mc", followers_mc, &b_followers_mc);
+   fChain->SetBranchAddress("followers.mctotalenergy", followers_mctotalenergy, &b_followers_mctotalenergy);
+   fChain->SetBranchAddress("followers.genievertex_fUniqueID", followers_genievertex_fUniqueID, &b_followers_genievertex_fUniqueID);
+   fChain->SetBranchAddress("followers.genievertex_fBits", followers_genievertex_fBits, &b_followers_genievertex_fBits);
+   fChain->SetBranchAddress("followers.genievertex_fX", followers_genievertex_fX, &b_followers_genievertex_fX);
+   fChain->SetBranchAddress("followers.genievertex_fY", followers_genievertex_fY, &b_followers_genievertex_fY);
+   fChain->SetBranchAddress("followers.genievertex_fZ", followers_genievertex_fZ, &b_followers_genievertex_fZ);
+   fChain->SetBranchAddress("followers.scatteringtype", followers_scatteringtype, &b_followers_scatteringtype);
+   fChain->SetBranchAddress("followers.interactiontype", followers_interactiontype, &b_followers_interactiontype);
+   fChain->SetBranchAddress("followers.neutrinoPDG", followers_neutrinoPDG, &b_followers_neutrinoPDG);
+   fChain->SetBranchAddress("followers.parentnucleonPDG", followers_parentnucleonPDG, &b_followers_parentnucleonPDG);
+   fChain->SetBranchAddress("followers.chargedleptonPDG", followers_chargedleptonPDG, &b_followers_chargedleptonPDG);
+   fChain->SetBranchAddress("followers.neutrinoenergy", followers_neutrinoenergy, &b_prompts_neutrinoenergy);
+   fChain->SetBranchAddress("followers.chargedleptonenergy", followers_chargedleptonenergy, &b_followers_chargedleptonenergy);
+   fChain->SetBranchAddress("followers.pioncount", followers_pioncount, &b_followers_pioncount);
+   fChain->SetBranchAddress("followers.protoncount", followers_protoncount, &b_followers_protoncount);
+   fChain->SetBranchAddress("followers.neutroncount", followers_neutroncount, &b_followers_neutroncount);
+   fChain->SetBranchAddress("followers.othercount", followers_othercount, &b_followers_othercount);
    fChain->SetBranchAddress("followers.deltat", followers_deltat, &b_followers_deltat);
    fChain->SetBranchAddress("reweight_up", &reweight_up, &b_prompts_reweight_up);
    fChain->SetBranchAddress("reweight_down", &reweight_down, &b_prompts_reweight_down);
